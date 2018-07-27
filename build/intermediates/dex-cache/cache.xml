@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="/home/max/AndroidStudioProjects/tRconverter/app/libs/tRconverter.jar"
+        jumboMode="false"
+        min-sdk-version="15"
+        optimize="true"
+        revision="26.0.2"
+        sha1="343f6d8fbf2a39329a33c6f0d75c0966e891592d">
+        <dex dex="/home/max/AndroidStudioProjects/tRconverter/app/build/intermediates/transforms/preDex/release/1.jar" />
+    </item>
+
+</items>
