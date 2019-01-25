@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
 
-import org.wycliffeassociates.translationrecorder.converter.Converter;
+import org.wycliffeassociates.trConverter.Converter;
 
 /**
  * Created by max on 11/11/17.
