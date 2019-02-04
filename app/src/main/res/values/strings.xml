@@ -1,7 +1,13 @@
 <resources>
     <string name="app_name">tRConverter</string>
     <string name="convert">Convert</string>
+    <string name="convert_continue">Continue</string>
     <string name="processing">Processing...</string>
+    <string name="analizing">Analizing...</string>
     <string name="grant_permission">You have to grant write permission!</string>
+    <string name="empty_modes">No audio files found!</string>
+    <string name="set_modes">Set mode for books marked in red and tap Continue!</string>
+    <string name="verse">verse</string>
+    <string name="chunk">chunk</string>
     <string name="app_info">This is the conversion tool that helps to migrate from older translationRecorder projects to the latest</string>
 </resources>

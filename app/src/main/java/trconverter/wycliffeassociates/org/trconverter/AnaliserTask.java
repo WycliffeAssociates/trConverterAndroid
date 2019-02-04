@@ -3,45 +3,46 @@ package trconverter.wycliffeassociates.org.trconverter;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.util.Log;
 
 import org.wycliffeassociates.trConverter.Converter;
 import org.wycliffeassociates.trConverter.Mode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by mXaln on 11/11/17.
  */
 
-public final class ConverterTask extends AsyncTask<List<Mode>, Integer, String> {
+public final class AnaliserTask extends AsyncTask<String, Integer, List<Mode>> {
 
     Context context;
-    ConverterResultCallback mCallback;
+    AnaliserResultCallback mCallback;
 
-    public ConverterTask(Context c) {
+    public AnaliserTask(Context c) {
         this.context = c;
-        this.mCallback = (ConverterResultCallback) c;
+        this.mCallback = (AnaliserResultCallback) c;
     }
 
     @Override
-    protected String doInBackground(List<Mode>... lists) {
+    protected List<Mode> doInBackground(String... values) {
         String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String[] params = new String[]{dir,"a"};
-        List<Mode> modes = lists[0];
+        String[] params = new String[]{dir,""};
 
         try {
             Converter converter = new Converter(params);
-
-            converter.setModes(modes);
-            return converter.convert();
+            converter.analize();
+            return converter.getModes();
         } catch (Exception e) {
-            return e.getMessage();
+            Log.e("TRC", e.getMessage());
+            return new ArrayList<>();
         }
     }
 
     @Override
     protected void onPreExecute() {
-        mCallback.convertionStarted();
+        mCallback.analizeStarted();
         super.onPreExecute();
     }
 
@@ -51,14 +52,14 @@ public final class ConverterTask extends AsyncTask<List<Mode>, Integer, String> 
     }
 
     @Override
-    protected void onPostExecute(String result) {
-        mCallback.convertionDone(result);
+    protected void onPostExecute(List<Mode> result) {
+        mCallback.analizeDone(result);
         super.onPostExecute(result);
     }
 
-    public interface ConverterResultCallback {
-        Void convertionStarted();
+    public interface AnaliserResultCallback {
+        Void analizeStarted();
 
-        Void convertionDone(String result);
+        Void analizeDone(List<Mode> result);
     }
 }
