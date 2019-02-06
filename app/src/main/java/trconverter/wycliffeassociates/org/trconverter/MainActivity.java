@@ -49,11 +49,14 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
             requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
         }
 
-        button.setOnClickListener((View v) -> {
-            if (modes.isEmpty())
-                analize();
-            else
-                convert();
+        button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                if (modes.isEmpty())
+                    analize();
+                else
+                    convert();
+            }
+
         });
     }
 
@@ -96,65 +99,77 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
 
     @Override
     public Void convertionStarted() {
-        runOnUiThread(() -> {
-            button.setEnabled(false);
-            button.setText(R.string.processing);
-            progress.setVisibility(View.VISIBLE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                button.setEnabled(false);
+                button.setText(R.string.processing);
+                progress.setVisibility(View.VISIBLE);
+            }
         });
         return null;
     }
 
     @Override
     public Void convertionDone(final String result) {
-        runOnUiThread(() -> {
-            modes.clear();
-            button.setEnabled(true);
-            button.setText(R.string.convert);
-            progress.setVisibility(View.GONE);
-            messageView.setText("");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                modes.clear();
+                button.setEnabled(true);
+                button.setText(R.string.convert);
+                progress.setVisibility(View.GONE);
+                messageView.setText("");
 
-            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+            }
         });
         return null;
     }
 
     @Override
     public Void analizeStarted() {
-        runOnUiThread(() -> {
-            button.setEnabled(false);
-            button.setText(R.string.analizing);
-            progress.setVisibility(View.VISIBLE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                button.setEnabled(false);
+                button.setText(R.string.analizing);
+                progress.setVisibility(View.VISIBLE);
+            }
         });
         return null;
     }
 
     @Override
-    public Void analizeDone(List<Mode> result) {
-        runOnUiThread(() -> {
-            modes = result;
-            button.setEnabled(true);
-            button.setText(R.string.convert_continue);
-            progress.setVisibility(View.GONE);
+    public Void analizeDone(final List<Mode> result) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                modes = result;
+                button.setEnabled(true);
+                button.setText(R.string.convert_continue);
+                progress.setVisibility(View.GONE);
 
-            if(modes.isEmpty()) {
-                Toast.makeText(getApplicationContext(), R.string.empty_modes, Toast.LENGTH_SHORT).show();
-                button.setText(R.string.convert);
-            } else {
-                Boolean shouldConvert = true;
-                for (Mode m: modes) {
-                    if (m.mode.isEmpty())
-                    {
-                        shouldConvert = false;
-                        break;
-                    }
-                }
-
-                if(shouldConvert) {
-                    convert();
+                if(modes.isEmpty()) {
+                    Toast.makeText(getApplicationContext(), R.string.empty_modes, Toast.LENGTH_SHORT).show();
+                    button.setText(R.string.convert);
                 } else {
-                    messageView.setText(R.string.set_modes);
-                    listAdapter = new ModeListAdapter(MainActivity.this, modes);
-                    listView.setAdapter(listAdapter);
+                    Boolean shouldConvert = true;
+                    for (Mode m: modes) {
+                        if (m.mode.isEmpty())
+                        {
+                            shouldConvert = false;
+                            break;
+                        }
+                    }
+
+                    if(shouldConvert) {
+                        convert();
+                    } else {
+                        messageView.setText(R.string.set_modes);
+                        listAdapter = new ModeListAdapter(MainActivity.this, modes);
+                        listView.setAdapter(listAdapter);
+                    }
                 }
             }
         });

@@ -68,8 +68,8 @@ public class ModeListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
-        Mode item = modes.get(position);
+        final ViewHolder viewHolder;
+        final Mode item = modes.get(position);
         Boolean empty = item.mode.isEmpty();
 
         if (convertView == null) {
@@ -108,14 +108,20 @@ public class ModeListAdapter extends BaseAdapter {
         }
 
         if (viewHolder.isEditable) {
-            viewHolder.verseButton.setOnClickListener((View v) -> {
-                item.mode = "verse";
-                viewHolder.projectText.setTextColor(Color.BLACK);
+            viewHolder.verseButton.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v) {
+                    item.mode = "verse";
+                    viewHolder.projectText.setTextColor(Color.BLACK);
+                }
+
             });
 
-            viewHolder.chunkButton.setOnClickListener((View v) -> {
-                item.mode = "chunk";
-                viewHolder.projectText.setTextColor(Color.BLACK);
+            viewHolder.chunkButton.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v) {
+                    item.mode = "chunk";
+                    viewHolder.projectText.setTextColor(Color.BLACK);
+                }
+
             });
         }
 
