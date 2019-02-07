@@ -1,4 +1,4 @@
-package trconverter.wycliffeassociates.org.trconverter;
+package org.wycliffeassociates.trconverter;
 
 import android.Manifest;
 import android.app.Activity;
@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.wycliffeassociates.trConverter.Converter;
 import org.wycliffeassociates.trConverter.Mode;
 
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
     private ModeListAdapter listAdapter;
 
     private List<Mode> modes = new ArrayList<>();
+
+    protected Converter converter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +59,9 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
                 else
                     convert();
             }
-
         });
+
+
     }
 
     protected void analize() {
@@ -73,27 +77,20 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
     }
 
     protected void convert() {
-        int permissionCheck = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            Boolean shouldConvert = true;
-            for (Mode m: modes) {
-                if (m.mode.isEmpty())
-                {
-                    shouldConvert = false;
-                    break;
-                }
+        Boolean shouldConvert = true;
+        for (Mode m: modes) {
+            if (m.mode.isEmpty())
+            {
+                shouldConvert = false;
+                break;
             }
+        }
 
-            if (shouldConvert) {
-                ConverterTask converter = new ConverterTask(MainActivity.this);
-                converter.execute(modes);
-            } else {
-                Toast.makeText(getApplicationContext(), R.string.set_modes, Toast.LENGTH_LONG).show();
-            }
+        if (shouldConvert) {
+            ConverterTask converter = new ConverterTask(MainActivity.this);
+            converter.execute(modes);
         } else {
-            Toast.makeText(getApplicationContext(), R.string.grant_permission, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.set_modes, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -105,6 +102,7 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
                 button.setEnabled(false);
                 button.setText(R.string.processing);
                 progress.setVisibility(View.VISIBLE);
+                messageView.setText("");
             }
         });
         return null;
@@ -119,7 +117,6 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
                 button.setEnabled(true);
                 button.setText(R.string.convert);
                 progress.setVisibility(View.GONE);
-                messageView.setText("");
 
                 Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
             }

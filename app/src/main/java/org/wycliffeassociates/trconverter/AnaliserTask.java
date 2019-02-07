@@ -1,4 +1,4 @@
-package trconverter.wycliffeassociates.org.trconverter;
+package org.wycliffeassociates.trconverter;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -17,11 +17,11 @@ import java.util.List;
 
 public final class AnaliserTask extends AsyncTask<String, Integer, List<Mode>> {
 
-    Context context;
+    MainActivity activity;
     AnaliserResultCallback mCallback;
 
     public AnaliserTask(Context c) {
-        this.context = c;
+        this.activity = (MainActivity) c;
         this.mCallback = (AnaliserResultCallback) c;
     }
 
@@ -31,9 +31,9 @@ public final class AnaliserTask extends AsyncTask<String, Integer, List<Mode>> {
         String[] params = new String[]{dir,""};
 
         try {
-            Converter converter = new Converter(params);
-            converter.analize();
-            return converter.getModes();
+            this.activity.converter = new Converter(params);
+            this.activity.converter.analize();
+            return this.activity.converter.getModes();
         } catch (Exception e) {
             Log.e("TRC", e.getMessage());
             return new ArrayList<>();

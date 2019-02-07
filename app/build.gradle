@@ -3,11 +3,11 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "trconverter.wycliffeassociates.org.trconverter"
+        applicationId "org.wycliffeassociates.trconverter"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 3
-        versionName "0.3"
+        versionCode 4
+        versionName "0.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

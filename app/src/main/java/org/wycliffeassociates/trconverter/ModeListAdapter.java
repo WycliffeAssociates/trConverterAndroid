@@ -1,4 +1,4 @@
-package trconverter.wycliffeassociates.org.trconverter;
+package org.wycliffeassociates.trconverter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,12 +17,10 @@ import org.wycliffeassociates.trConverter.Mode;
 import java.util.List;
 
 public class ModeListAdapter extends BaseAdapter {
-    Activity mainActivity;
     List<Mode> modes;
     LayoutInflater layoutInflater;
 
     public ModeListAdapter(Activity activity, List<Mode> modes) {
-        this.mainActivity = activity;
         this.modes = modes;
         layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }

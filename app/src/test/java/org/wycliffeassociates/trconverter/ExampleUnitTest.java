@@ -1,4 +1,4 @@
-package trconverter.wycliffeassociates.org.trconverter;
+package org.wycliffeassociates.trconverter;
 
 import org.junit.Test;
 

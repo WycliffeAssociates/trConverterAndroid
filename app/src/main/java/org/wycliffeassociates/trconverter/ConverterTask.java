@@ -1,10 +1,8 @@
-package trconverter.wycliffeassociates.org.trconverter;
+package org.wycliffeassociates.trconverter;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Environment;
 
-import org.wycliffeassociates.trConverter.Converter;
 import org.wycliffeassociates.trConverter.Mode;
 
 import java.util.List;
@@ -15,25 +13,21 @@ import java.util.List;
 
 public final class ConverterTask extends AsyncTask<List<Mode>, Integer, String> {
 
-    Context context;
+    MainActivity activity;
     ConverterResultCallback mCallback;
 
     public ConverterTask(Context c) {
-        this.context = c;
+        this.activity = (MainActivity) c;
         this.mCallback = (ConverterResultCallback) c;
     }
 
     @Override
     protected String doInBackground(List<Mode>... lists) {
-        String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String[] params = new String[]{dir,"a"};
         List<Mode> modes = lists[0];
 
         try {
-            Converter converter = new Converter(params);
-
-            converter.setModes(modes);
-            return converter.convert();
+            this.activity.converter.setModes(modes);
+            return this.activity.converter.convert();
         } catch (Exception e) {
             return e.getMessage();
         }

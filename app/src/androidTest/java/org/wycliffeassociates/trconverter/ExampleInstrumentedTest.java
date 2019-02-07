@@ -1,4 +1,4 @@
-package trconverter.wycliffeassociates.org.trconverter;
+package org.wycliffeassociates.trconverter;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
