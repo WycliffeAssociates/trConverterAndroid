@@ -21,86 +21,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4bd207f1-0c35-4dae-a311-62167483d2f7" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/app/src/androidTest/java/org/wycliffeassociates/trconverter/ExampleInstrumentedTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/ic_launcher-web.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/org/wycliffeassociates/trconverter/AnaliserTask.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/org/wycliffeassociates/trconverter/ConverterTask.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/org/wycliffeassociates/trconverter/MainActivity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/org/wycliffeassociates/trconverter/ModeListAdapter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_launcher_foreground.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_trc_icon.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/ic_launcher_background.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/ic_launcher_background.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/ic_launcher_background.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/ic_launcher_background.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-xxxhdpi/ic_launcher_background.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/test/java/org/wycliffeassociates/trconverter/ExampleUnitTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileChanges/last-build.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileContent/fileContent.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/resourceHashesCache.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/jarAnalysis.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskJars.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_constraint_constraint_layout_1_0_2.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_constraint_constraint_layout_solver_1_0_2_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_test_espresso_espresso_core_3_0_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_test_espresso_espresso_idling_resource_3_0_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_test_rules_1_0_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_test_runner_1_0_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_google_code_findbugs_jsr305_2_0_1_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_squareup_javawriter_2_1_1_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__javax_inject_javax_inject_1_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__junit_junit_4_12_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__net_sf_kxml_kxml2_2_3_0_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_hamcrest_hamcrest_core_1_3_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_hamcrest_hamcrest_integration_1_3_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_hamcrest_hamcrest_library_1_3_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/androidTest/java/trconverter/wycliffeassociates/org/trconverter/ExampleInstrumentedTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/trconverter/wycliffeassociates/org/trconverter/AnaliserTask.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/trconverter/wycliffeassociates/org/trconverter/ConverterTask.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/trconverter/wycliffeassociates/org/trconverter/MainActivity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/trconverter/wycliffeassociates/org/trconverter/ModeListAdapter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/ic_launcher_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_launcher_background.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/ic_launcher.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/ic_launcher_round.png" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/ic_launcher_round.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/ic_launcher.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/ic_launcher_round.png" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/ic_launcher_round.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/ic_launcher.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/test/java/trconverter/wycliffeassociates/org/trconverter/ExampleUnitTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/intermediates/dex-cache/cache.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/intermediates/lint-cache/maven.google/com/android/support/constraint/group-index.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/intermediates/lint-cache/maven.google/com/android/support/group-index.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/intermediates/lint-cache/maven.google/com/android/support/test/espresso/group-index.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/intermediates/lint-cache/maven.google/com/android/support/test/group-index.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/intermediates/lint-cache/maven.google/master-index.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tRconverter.iml" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -137,8 +59,8 @@
       <file leaf-file-name="build.gradle" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="414">
-              <caret line="23" column="30" selection-start-line="23" selection-start-column="30" selection-end-line="23" selection-end-column="30" />
+            <state relative-caret-position="360">
+              <caret line="20" column="51" selection-start-line="20" selection-start-column="51" selection-end-line="20" selection-end-column="51" />
             </state>
           </provider>
         </entry>
@@ -2455,12 +2377,18 @@
       <option name="project" value="LOCAL" />
       <updated>1549487815297</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Refactored directory structure, changed app id; Converter doesn't create two backups in single operation">
+      <created>1549577955280</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1549577955280</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="28" width="1920" height="1052" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="Android Profiler" order="7" weight="0.32984293" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -2472,12 +2400,12 @@
       <window_info anchor="right" id="Preview" order="4" sideWeight="0.4625" weight="0.32977587" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32972974" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32756758" />
-      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32901832" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.32864866" />
       <window_info anchor="bottom" id="Logcat" order="7" weight="0.32972974" />
       <window_info id="Captures" order="2" weight="0.25" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2497332" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2497332" />
       <window_info anchor="bottom" id="Build" order="7" weight="0.32972974" />
       <window_info anchor="right" id="Gradle" order="3" sideWeight="0.4963351" weight="0.32977587" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -2503,7 +2431,8 @@
     <MESSAGE value="Updated converter lib" />
     <MESSAGE value="Added ability for user to set mode for unrecognized books" />
     <MESSAGE value="Downgraded to gradle 3.0.1" />
-    <option name="LAST_COMMIT_MESSAGE" value="Downgraded to gradle 3.0.1" />
+    <MESSAGE value="Refactored directory structure, changed app id; Converter doesn't create two backups in single operation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactored directory structure, changed app id; Converter doesn't create two backups in single operation" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/app/build.gradle">
@@ -2751,8 +2680,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="414">
-          <caret line="23" column="30" selection-start-line="23" selection-start-column="30" selection-end-line="23" selection-end-column="30" />
+        <state relative-caret-position="360">
+          <caret line="20" column="51" selection-start-line="20" selection-start-column="51" selection-end-line="20" selection-end-column="51" />
         </state>
       </provider>
     </entry>
