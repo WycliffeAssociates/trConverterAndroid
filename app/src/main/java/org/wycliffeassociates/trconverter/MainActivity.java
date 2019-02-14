@@ -177,6 +177,7 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
             public void run() {
                 modes.clear();
                 converter.setModes(modes);
+                converter.generateDatetimeDirectory();
                 button.setEnabled(true);
                 button.setText(R.string.analyze);
                 progress.setVisibility(View.GONE);
