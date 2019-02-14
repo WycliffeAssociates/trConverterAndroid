@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity implements ConverterTask.ConverterResultCallback,
-        AnaliserTask.AnaliserResultCallback {
+        AnalyserTask.AnaliserResultCallback {
 
     private Button button;
     private ProgressBar progress;
@@ -62,7 +62,7 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
             button.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v) {
                     if (modes.isEmpty())
-                        analize();
+                        analyze();
                     else
                         convert();
                 }
@@ -73,25 +73,25 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
         }
     }
 
-    protected void analize() {
+    protected void analyze() {
         int permissionCheck = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            AnaliserTask analiserTask = new AnaliserTask(MainActivity.this);
-            analiserTask.execute();
+            AnalyserTask analyserTask = new AnalyserTask(MainActivity.this);
+            analyserTask.execute();
         } else {
             Toast.makeText(getApplicationContext(), R.string.grant_permission, Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
-    public Void analizeStarted() {
+    public Void analyzeStarted() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setEnabled(false);
-                button.setText(R.string.analizing);
+                button.setText(R.string.analyzing);
                 progress.setVisibility(View.VISIBLE);
             }
         });
@@ -99,36 +99,34 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
     }
 
     @Override
-    public Void analizeDone() {
+    public Void analyzeDone() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 modes = converter.getModes();
                 button.setEnabled(true);
-                button.setText(R.string.convert_continue);
+                button.setText(R.string.convert);
                 listView.setVisibility(View.VISIBLE);
                 progress.setVisibility(View.GONE);
 
                 if(modes.isEmpty()) {
                     Toast.makeText(getApplicationContext(), R.string.empty_modes, Toast.LENGTH_SHORT).show();
-                    button.setText(R.string.convert);
+                    button.setText(R.string.analyze);
                 } else {
-                    Boolean shouldConvert = true;
+                    Boolean hasEmptyModes = false;
                     for (Mode m: modes) {
                         if (m.mode.isEmpty())
                         {
-                            shouldConvert = false;
+                            hasEmptyModes = true;
                             break;
                         }
                     }
 
-                    if(shouldConvert) {
-                        convert();
-                    } else {
+                    if(hasEmptyModes) {
                         messageView.setText(R.string.set_modes);
-                        listAdapter = new ModeListAdapter(MainActivity.this, modes);
-                        listView.setAdapter(listAdapter);
                     }
+                    listAdapter = new ModeListAdapter(MainActivity.this, modes);
+                    listView.setAdapter(listAdapter);
                 }
             }
         });
@@ -136,16 +134,16 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
     }
 
     protected void convert() {
-        Boolean shouldConvert = true;
+        Boolean hasEmptyModes = false;
         for (Mode m: modes) {
             if (m.mode.isEmpty())
             {
-                shouldConvert = false;
+                hasEmptyModes = true;
                 break;
             }
         }
 
-        if (shouldConvert) {
+        if (!hasEmptyModes) {
             converter.setModes(modes);
             ConverterTask converterTask = new ConverterTask(MainActivity.this);
             converterTask.execute();
@@ -155,7 +153,7 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
     }
 
     @Override
-    public Void convertionStarted() {
+    public Void conversionStarted() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -170,14 +168,14 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
     }
 
     @Override
-    public Void convertionDone(final String result) {
+    public Void conversionDone(final String result) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 modes.clear();
                 converter.setModes(modes);
                 button.setEnabled(true);
-                button.setText(R.string.convert);
+                button.setText(R.string.analyze);
                 progress.setVisibility(View.GONE);
 
                 Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();

@@ -24,7 +24,7 @@ public final class ConverterTask extends AsyncTask<Void, Integer, String> {
 
     @Override
     protected void onPreExecute() {
-        mCallback.convertionStarted();
+        mCallback.conversionStarted();
         super.onPreExecute();
     }
 
@@ -35,13 +35,13 @@ public final class ConverterTask extends AsyncTask<Void, Integer, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        mCallback.convertionDone(result);
+        mCallback.conversionDone(result);
         super.onPostExecute(result);
     }
 
     public interface ConverterResultCallback {
-        Void convertionStarted();
+        Void conversionStarted();
 
-        Void convertionDone(String result);
+        Void conversionDone(String result);
     }
 }

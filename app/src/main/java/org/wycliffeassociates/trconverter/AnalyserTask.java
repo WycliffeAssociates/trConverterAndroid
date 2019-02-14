@@ -7,12 +7,12 @@ import android.os.AsyncTask;
  * Created by mXaln on 11/11/17.
  */
 
-public final class AnaliserTask extends AsyncTask<Void, Integer, Void> {
+public final class AnalyserTask extends AsyncTask<Void, Integer, Void> {
 
     MainActivity activity;
     AnaliserResultCallback mCallback;
 
-    public AnaliserTask(Context c) {
+    public AnalyserTask(Context c) {
         this.activity = (MainActivity) c;
         this.mCallback = (AnaliserResultCallback) c;
     }
@@ -25,7 +25,7 @@ public final class AnaliserTask extends AsyncTask<Void, Integer, Void> {
 
     @Override
     protected void onPreExecute() {
-        mCallback.analizeStarted();
+        mCallback.analyzeStarted();
         super.onPreExecute();
     }
 
@@ -36,13 +36,13 @@ public final class AnaliserTask extends AsyncTask<Void, Integer, Void> {
 
     @Override
     protected void onPostExecute(Void param) {
-        mCallback.analizeDone();
+        mCallback.analyzeDone();
         super.onPostExecute(param);
     }
 
     public interface AnaliserResultCallback {
-        Void analizeStarted();
+        Void analyzeStarted();
 
-        Void analizeDone();
+        Void analyzeDone();
     }
 }

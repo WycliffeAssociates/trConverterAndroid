@@ -61,14 +61,14 @@ public class ModeListAdapter extends BaseAdapter {
         RadioButton verseButton;
         RadioButton chunkButton;
 
-        Boolean isEditable = null;
+        Boolean isEmpty = null;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final ViewHolder viewHolder;
         final Mode item = modes.get(position);
-        Boolean empty = item.mode.isEmpty();
+        Boolean isEmpty = item.mode.isEmpty();
 
         if (convertView == null) {
             viewHolder = new ViewHolder();
@@ -83,45 +83,35 @@ public class ModeListAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if (viewHolder.isEditable == null) {
-            viewHolder.isEditable = empty;
+        if (viewHolder.isEmpty == null) {
+            viewHolder.isEmpty = isEmpty;
         }
 
         viewHolder.projectText.setText(item.projectName);
-        if (!viewHolder.isEditable) {
+        if (!viewHolder.isEmpty) {
             viewHolder.projectText.setTextColor(Color.GRAY);
         } else {
-            viewHolder.projectText.setTextColor(empty ? Color.RED : Color.BLACK);
+            viewHolder.projectText.setTextColor(isEmpty ? Color.RED : Color.BLACK);
             viewHolder.projectText.setTypeface(null, Typeface.BOLD);
         }
 
         viewHolder.verseButton.setChecked(item.mode.equals("verse"));
-        if (!viewHolder.isEditable) {
-            viewHolder.verseButton.setEnabled(false);
-        }
+        viewHolder.verseButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                item.mode = "verse";
+                viewHolder.projectText.setTextColor(Color.BLACK);
+            }
+
+        });
 
         viewHolder.chunkButton.setChecked(item.mode.equals("chunk"));
-        if (!viewHolder.isEditable) {
-            viewHolder.chunkButton.setEnabled(false);
-        }
+        viewHolder.chunkButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                item.mode = "chunk";
+                viewHolder.projectText.setTextColor(Color.BLACK);
+            }
 
-        if (viewHolder.isEditable) {
-            viewHolder.verseButton.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View v) {
-                    item.mode = "verse";
-                    viewHolder.projectText.setTextColor(Color.BLACK);
-                }
-
-            });
-
-            viewHolder.chunkButton.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View v) {
-                    item.mode = "chunk";
-                    viewHolder.projectText.setTextColor(Color.BLACK);
-                }
-
-            });
-        }
+        });
 
         return convertView;
     }
