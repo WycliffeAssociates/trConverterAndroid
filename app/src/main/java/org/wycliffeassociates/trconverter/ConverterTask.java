@@ -7,7 +7,7 @@ import android.os.AsyncTask;
  * Created by mXaln on 11/11/17.
  */
 
-public final class ConverterTask extends AsyncTask<Void, Integer, String> {
+public final class ConverterTask extends AsyncTask<Void, Integer, Integer> {
 
     MainActivity activity;
     ConverterResultCallback mCallback;
@@ -18,7 +18,7 @@ public final class ConverterTask extends AsyncTask<Void, Integer, String> {
     }
 
     @Override
-    protected String doInBackground(Void... params) {
+    protected Integer doInBackground(Void... params) {
         return this.activity.converter.convert();
     }
 
@@ -34,7 +34,7 @@ public final class ConverterTask extends AsyncTask<Void, Integer, String> {
     }
 
     @Override
-    protected void onPostExecute(String result) {
+    protected void onPostExecute(Integer result) {
         mCallback.conversionDone(result);
         super.onPostExecute(result);
     }
@@ -42,6 +42,6 @@ public final class ConverterTask extends AsyncTask<Void, Integer, String> {
     public interface ConverterResultCallback {
         Void conversionStarted();
 
-        Void conversionDone(String result);
+        Void conversionDone(Integer result);
     }
 }

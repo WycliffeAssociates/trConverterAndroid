@@ -93,6 +93,10 @@ public class ModeListAdapter extends BaseAdapter {
         } else {
             viewHolder.projectText.setTextColor(isEmpty ? Color.RED : Color.BLACK);
             viewHolder.projectText.setTypeface(null, Typeface.BOLD);
+            viewHolder.verseButton.setTextColor(isEmpty ? Color.RED : Color.BLACK);
+            viewHolder.verseButton.setTypeface(null, Typeface.BOLD);
+            viewHolder.chunkButton.setTextColor(isEmpty ? Color.RED : Color.BLACK);
+            viewHolder.chunkButton.setTypeface(null, Typeface.BOLD);
         }
 
         viewHolder.verseButton.setChecked(item.mode.equals("verse"));
@@ -100,6 +104,8 @@ public class ModeListAdapter extends BaseAdapter {
             public void onClick(View v) {
                 item.mode = "verse";
                 viewHolder.projectText.setTextColor(Color.BLACK);
+                viewHolder.verseButton.setTextColor(Color.BLACK);
+                viewHolder.chunkButton.setTextColor(Color.BLACK);
             }
 
         });
@@ -109,6 +115,8 @@ public class ModeListAdapter extends BaseAdapter {
             public void onClick(View v) {
                 item.mode = "chunk";
                 viewHolder.projectText.setTextColor(Color.BLACK);
+                viewHolder.verseButton.setTextColor(Color.BLACK);
+                viewHolder.chunkButton.setTextColor(Color.BLACK);
             }
 
         });

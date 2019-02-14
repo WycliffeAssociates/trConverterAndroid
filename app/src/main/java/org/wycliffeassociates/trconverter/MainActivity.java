@@ -3,6 +3,7 @@ package org.wycliffeassociates.trconverter;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -93,6 +94,7 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
                 button.setEnabled(false);
                 button.setText(R.string.analyzing);
                 progress.setVisibility(View.VISIBLE);
+                messageView.setText("");
             }
         });
         return null;
@@ -124,6 +126,7 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
 
                     if(hasEmptyModes) {
                         messageView.setText(R.string.set_modes);
+                        messageView.setTextColor(Color.RED);
                     }
                     listAdapter = new ModeListAdapter(MainActivity.this, modes);
                     listView.setAdapter(listAdapter);
@@ -168,7 +171,7 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
     }
 
     @Override
-    public Void conversionDone(final String result) {
+    public Void conversionDone(final Integer result) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -178,7 +181,12 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
                 button.setText(R.string.analyze);
                 progress.setVisibility(View.GONE);
 
-                Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+                if(result >= 0) {
+                    messageView.setText(getString(R.string.conversion_complete, result));
+                } else {
+                    messageView.setText(R.string.error_occurred);
+                }
+                messageView.setTextColor(Color.BLACK);
             }
         });
         return null;
