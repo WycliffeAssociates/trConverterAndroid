@@ -19,7 +19,7 @@ public final class AnalyserTask extends AsyncTask<Void, Integer, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        this.activity.converter.analize();
+        this.activity.converter.analyze();
         return null;
     }
 

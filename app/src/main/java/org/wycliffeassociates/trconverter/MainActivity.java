@@ -49,11 +49,6 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
     }
 
     protected void init() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-            requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        }
-
         try {
             String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
             String[] params = new String[]{dir,""};
@@ -75,15 +70,8 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
     }
 
     protected void analyze() {
-        int permissionCheck = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            AnalyserTask analyserTask = new AnalyserTask(MainActivity.this);
-            analyserTask.execute();
-        } else {
-            Toast.makeText(getApplicationContext(), R.string.grant_permission, Toast.LENGTH_LONG).show();
-        }
+        AnalyserTask analyserTask = new AnalyserTask(MainActivity.this);
+        analyserTask.execute();
     }
 
     @Override
