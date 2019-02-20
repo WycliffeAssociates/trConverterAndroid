@@ -1,4 +1,4 @@
-package org.wycliffeassociates.trconverter;
+package org.wycliffeassociates.converter;
 
 import android.app.Activity;
 import android.content.Context;

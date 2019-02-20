@@ -1,20 +1,11 @@
-package org.wycliffeassociates.trconverter;
+package org.wycliffeassociates.converter;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
-
+import android.widget.*;
 import org.wycliffeassociates.trConverter.Converter;
 import org.wycliffeassociates.trConverter.Mode;
 
@@ -165,7 +156,7 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
             public void run() {
                 modes.clear();
                 converter.setModes(modes);
-                converter.generateDatetimeDirectory();
+                converter.setDateTimeDir();
                 button.setEnabled(true);
                 button.setText(R.string.analyze);
                 progress.setVisibility(View.GONE);
