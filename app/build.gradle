@@ -1,6 +1,6 @@
 apply plugin: "com.android.application"
 
-ext.trc_version = "0.2.4"
+ext.trc_version = "0.2.6"
 
 configurations.all {
     resolutionStrategy.dependencySubstitution {
