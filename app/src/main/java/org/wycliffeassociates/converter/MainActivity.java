@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.*;
 import org.wycliffeassociates.trConverter.Converter;
+import org.wycliffeassociates.trConverter.IConverter;
 import org.wycliffeassociates.trConverter.Mode;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
 
     private List<Mode> modes = new ArrayList<>();
 
-    protected Converter converter;
+    protected IConverter converter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +43,7 @@ public class MainActivity extends Activity implements ConverterTask.ConverterRes
     protected void init() {
         try {
             String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
-            String[] params = new String[]{dir,""};
-
-            converter = new Converter(params);
+            converter = new Converter(dir);
 
             button.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v) {

@@ -19,7 +19,7 @@ public final class ConverterTask extends AsyncTask<Void, Integer, Integer> {
 
     @Override
     protected Integer doInBackground(Void... params) {
-        return this.activity.converter.convert();
+        return this.activity.converter.execute();
     }
 
     @Override
