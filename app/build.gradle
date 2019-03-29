@@ -19,9 +19,24 @@ android {
         versionName "1.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        if(project.hasProperty('keystorePath')
+                && project.hasProperty('storePass')
+                && project.hasProperty('keyPass')) {
+            release {
+                storeFile file(keystorePath)
+                storePassword storePass
+                keyAlias "translationRecorderAndroidKey"
+                keyPassword keyPass
+            }
+        } else {
+            release {}
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
