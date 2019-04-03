@@ -1,6 +1,6 @@
 package org.wycliffeassociates.converter;
 
-import android.content.Context;
+import android.app.Fragment;
 import android.os.AsyncTask;
 
 /**
@@ -9,23 +9,21 @@ import android.os.AsyncTask;
 
 public final class AnalyserTask extends AsyncTask<Void, Integer, Void> {
 
-    MainActivity activity;
-    AnaliserResultCallback mCallback;
+    AnaliserResultCallback callback;
 
-    public AnalyserTask(Context c) {
-        this.activity = (MainActivity) c;
-        this.mCallback = (AnaliserResultCallback) c;
+    public AnalyserTask(Fragment c) {
+        this.callback = (AnaliserResultCallback) c;
     }
 
     @Override
     protected Void doInBackground(Void... params) {
-        this.activity.converter.analyze();
+        callback.startAnalyze();
         return null;
     }
 
     @Override
     protected void onPreExecute() {
-        mCallback.analyzeStarted();
+        callback.analyzeStarted();
         super.onPreExecute();
     }
 
@@ -36,13 +34,13 @@ public final class AnalyserTask extends AsyncTask<Void, Integer, Void> {
 
     @Override
     protected void onPostExecute(Void param) {
-        mCallback.analyzeDone();
+        callback.analyzeDone();
         super.onPostExecute(param);
     }
 
     public interface AnaliserResultCallback {
+        Void startAnalyze();
         Void analyzeStarted();
-
         Void analyzeDone();
     }
 }

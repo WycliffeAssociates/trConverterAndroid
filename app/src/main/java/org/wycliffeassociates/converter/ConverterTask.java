@@ -1,6 +1,6 @@
 package org.wycliffeassociates.converter;
 
-import android.content.Context;
+import android.app.Fragment;
 import android.os.AsyncTask;
 
 /**
@@ -9,22 +9,20 @@ import android.os.AsyncTask;
 
 public final class ConverterTask extends AsyncTask<Void, Integer, Integer> {
 
-    MainActivity activity;
-    ConverterResultCallback mCallback;
+    ConverterResultCallback callback;
 
-    public ConverterTask(Context c) {
-        this.activity = (MainActivity) c;
-        this.mCallback = (ConverterResultCallback) c;
+    public ConverterTask(Fragment c) {
+        this.callback = (ConverterResultCallback) c;
     }
 
     @Override
     protected Integer doInBackground(Void... params) {
-        return this.activity.converter.execute();
+        return callback.startConversion();
     }
 
     @Override
     protected void onPreExecute() {
-        mCallback.conversionStarted();
+        callback.conversionStarted();
         super.onPreExecute();
     }
 
@@ -35,13 +33,13 @@ public final class ConverterTask extends AsyncTask<Void, Integer, Integer> {
 
     @Override
     protected void onPostExecute(Integer result) {
-        mCallback.conversionDone(result);
+        callback.conversionDone(result);
         super.onPostExecute(result);
     }
 
     public interface ConverterResultCallback {
+        Integer startConversion();
         Void conversionStarted();
-
         Void conversionDone(Integer result);
     }
 }
