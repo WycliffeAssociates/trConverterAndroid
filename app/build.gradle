@@ -1,6 +1,6 @@
 apply plugin: "com.android.application"
 
-ext.trc_version = "0.2.8"
+ext.trc_version = "0.2.9"
 
 configurations.all {
     resolutionStrategy.dependencySubstitution {
@@ -15,8 +15,8 @@ android {
         applicationId "org.wycliffeassociates.trconverter"
         minSdkVersion 19
         targetSdkVersion 22
-        versionCode 15
-        versionName "1.4.1"
+        versionCode 16
+        versionName "1.4.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
