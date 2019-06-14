@@ -1,11 +1,11 @@
 package org.wycliffeassociates.converter;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -129,7 +129,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
                 messageView.setText(R.string.set_modes);
                 messageView.setTextColor(Color.RED);
             }
-            listAdapter = new ModeListAdapter(getActivity(), modes);
+            listAdapter = new ModeListAdapter((MainActivity) getActivity(), modes);
             listView.setAdapter(listAdapter);
         }
         return null;
@@ -199,7 +199,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
     protected void init() {
         if(!modes.isEmpty()) {
             buttonText = getString(R.string.convert);
-            listAdapter = new ModeListAdapter(getActivity(), modes);
+            listAdapter = new ModeListAdapter((MainActivity) getActivity(), modes);
             listView.setAdapter(listAdapter);
         }
 
@@ -213,7 +213,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
         messageView.setText(messageText);
 
         try {
-            String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
+            String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/TranslationRecorder";
             converter = new Converter(dir);
 
             button.setOnClickListener(new View.OnClickListener(){
@@ -228,5 +228,11 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
             Toast.makeText(getActivity().getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        analyze();
     }
 }

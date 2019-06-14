@@ -7,22 +7,22 @@ import android.support.v4.app.Fragment;
  * Created by mXaln on 11/11/17.
  */
 
-public final class ConverterTask extends AsyncTask<Void, Integer, Integer> {
+public final class TransformerTask extends AsyncTask<Void, Integer, Integer> {
 
-    ConverterResultCallback callback;
+    TransformerResultCallback callback;
 
-    public ConverterTask(Fragment c) {
-        this.callback = (ConverterResultCallback) c;
+    public TransformerTask(Fragment c) {
+        this.callback = (TransformerResultCallback) c;
     }
 
     @Override
     protected Integer doInBackground(Void... params) {
-        return callback.startConversion();
+        return callback.startTransformation();
     }
 
     @Override
     protected void onPreExecute() {
-        callback.conversionStarted();
+        callback.transformationStarted();
         super.onPreExecute();
     }
 
@@ -33,13 +33,13 @@ public final class ConverterTask extends AsyncTask<Void, Integer, Integer> {
 
     @Override
     protected void onPostExecute(Integer result) {
-        callback.conversionDone(result);
+        callback.transformationDone(result);
         super.onPostExecute(result);
     }
 
-    public interface ConverterResultCallback {
-        Integer startConversion();
-        Void conversionStarted();
-        Void conversionDone(Integer result);
+    public interface TransformerResultCallback {
+        Integer startTransformation();
+        Void transformationStarted();
+        Void transformationDone(Integer result);
     }
 }

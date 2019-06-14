@@ -1,51 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/projectTextView"
-        android:layout_width="210dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:padding="5dp"
-        android:singleLine="true"
-        android:text="project"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/projectTextView"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:padding="5dp"
+            android:singleLine="true"
+            android:text="@string/project"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/radioGroup"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
 
     <RadioGroup
-        android:id="@+id/radioGroup"
-        android:layout_width="160dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/projectTextView"
-        app:layout_constraintTop_toTopOf="parent">
+            android:id="@+id/radioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toEndOf="@+id/projectTextView"
+            app:layout_constraintEnd_toStartOf="@+id/divider"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp">
 
         <RadioButton
-            android:id="@+id/verseRadio"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:singleLine="true"
-            android:text="@string/verse"
-            android:textColor="#000" />
+                android:id="@+id/verseRadio"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:singleLine="true"
+                android:text="@string/verse"
+                android:textColor="#000"/>
 
         <RadioButton
-            android:id="@+id/chunkRadio"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:singleLine="true"
-            android:text="@string/chunk"
-            android:textColor="#000" />
+                android:id="@+id/chunkRadio"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:singleLine="true"
+                android:text="@string/chunk"
+                android:textColor="#000"/>
     </RadioGroup>
+
+    <View
+            android:id="@+id/divider"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="@android:color/darker_gray"
+            app:layout_constraintStart_toEndOf="@+id/radioGroup"
+            app:layout_constraintEnd_toStartOf="@+id/editProject"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+    />
+
+    <Button
+            android:id="@+id/editProject"
+            android:text="@string/edit"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            app:layout_constraintStart_toEndOf="@+id/divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            style="@android:style/Widget.Button"
+            android:background="@drawable/orange_button"
+            android:textColor="#fff"
+            android:textStyle="bold" />
+
+
 </android.support.constraint.ConstraintLayout>

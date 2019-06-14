@@ -1,16 +1,14 @@
 package org.wycliffeassociates.converter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
+import android.widget.*;
 
 import org.wycliffeassociates.trConverter.Mode;
 
@@ -19,10 +17,12 @@ import java.util.List;
 public class ModeListAdapter extends BaseAdapter {
     List<Mode> modes;
     LayoutInflater layoutInflater;
+    FragmentManager fragmentManager;
 
-    public ModeListAdapter(Activity activity, List<Mode> modes) {
+    public ModeListAdapter(MainActivity activity, List<Mode> modes) {
         this.modes = modes;
         layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        fragmentManager = activity.getSupportFragmentManager();
     }
 
     @Override
@@ -60,6 +60,7 @@ public class ModeListAdapter extends BaseAdapter {
         RadioGroup radioGroup;
         RadioButton verseButton;
         RadioButton chunkButton;
+        Button editButton;
 
         Boolean isEmpty = null;
     }
@@ -77,6 +78,7 @@ public class ModeListAdapter extends BaseAdapter {
             viewHolder.radioGroup = convertView.findViewById(R.id.radioGroup);
             viewHolder.verseButton = convertView.findViewById(R.id.verseRadio);
             viewHolder.chunkButton = convertView.findViewById(R.id.chunkRadio);
+            viewHolder.editButton = convertView.findViewById(R.id.editProject);
 
             convertView.setTag(viewHolder);
         } else {
@@ -87,9 +89,21 @@ public class ModeListAdapter extends BaseAdapter {
             viewHolder.isEmpty = isEmpty;
         }
 
-        viewHolder.projectText.setText(item.projectName);
+        viewHolder.projectText.setText(item.toString());
         if (!viewHolder.isEmpty) {
             viewHolder.projectText.setTextColor(Color.GRAY);
+
+            viewHolder.editButton.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v) {
+                    FragmentTransaction ft = fragmentManager.beginTransaction();
+                    ft.replace(R.id.fragment_container,
+                            TransformerFragment.newInstance(item.toString(), item.language, item.version, item.book));
+                    ft.setTransition(FragmentTransaction.TRANSIT_ENTER_MASK);
+                    ft.addToBackStack(null);
+                    ft.commit();
+                }
+
+            });
         } else {
             viewHolder.projectText.setTextColor(isEmpty ? Color.RED : Color.BLACK);
             viewHolder.projectText.setTypeface(null, Typeface.BOLD);
@@ -97,6 +111,7 @@ public class ModeListAdapter extends BaseAdapter {
             viewHolder.verseButton.setTypeface(null, Typeface.BOLD);
             viewHolder.chunkButton.setTextColor(isEmpty ? Color.RED : Color.BLACK);
             viewHolder.chunkButton.setTypeface(null, Typeface.BOLD);
+            viewHolder.editButton.setEnabled(false);
         }
 
         viewHolder.verseButton.setChecked(item.mode.equals("verse"));

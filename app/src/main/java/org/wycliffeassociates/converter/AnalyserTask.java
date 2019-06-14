@@ -1,7 +1,7 @@
 package org.wycliffeassociates.converter;
 
-import android.app.Fragment;
 import android.os.AsyncTask;
+import android.support.v4.app.Fragment;
 
 /**
  * Created by mXaln on 11/11/17.

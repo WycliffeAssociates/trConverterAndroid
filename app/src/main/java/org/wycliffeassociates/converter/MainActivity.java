@@ -1,27 +1,29 @@
 package org.wycliffeassociates.converter;
 
-import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
 
-    private ConverterFragment converterFragment;
+    private Fragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FragmentManager fm = getFragmentManager();
+        FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
 
-        converterFragment = (ConverterFragment) fm.findFragmentById(R.id.fragment_container);
+        fragment = fm.findFragmentById(R.id.fragment_container);
 
-        if(converterFragment == null) {
-            converterFragment = new ConverterFragment();
-            ft.add(R.id.fragment_container, converterFragment).commit();
+        if(fragment == null) {
+            fragment = new ConverterFragment();
+            ft.replace(R.id.fragment_container, fragment);
+            ft.commit();
         }
     }
 }

@@ -1,15 +1,22 @@
 <resources>
     <string name="app_name">tRConverter</string>
-    <string name="app_info">ver.1.4.3</string>
+    <string name="app_info">ver.1.5.0</string>
     <string name="convert">Convert</string>
     <string name="analyze">Analyze</string>
+    <string name="transform">Transform</string>
     <string name="processing">Processing&#8230;</string>
     <string name="analyzing">Analyzing&#8230;</string>
     <string name="grant_permission">You have to grant write permission!</string>
     <string name="empty_modes">No audio files found!</string>
     <string name="set_modes">Set mode for books marked in red and tap Convert!</string>
     <string name="conversion_complete">Conversion complete: %1$d files have been affected.</string>
+    <string name="transformation_complete">Transformation complete: %1$d files have been affected.</string>
     <string name="error_occurred">An error occurred.</string>
+    <string name="set_fields">Make sure that you have properly all the values</string>
     <string name="verse">verse</string>
     <string name="chunk">chunk</string>
+    <string name="edit">edit</string>
+    <string name="project">project</string>
+    <string name="enter_language">Enter Language Code (en, fr, es-419, ...)</string>
+    <string name="enter_version">Enter Version Code (ulb, udb, reg, ...)</string>
 </resources>
