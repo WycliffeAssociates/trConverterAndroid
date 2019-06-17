@@ -93,7 +93,7 @@
                 android:layout_height="62dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/orange_button"
+                android:background="@drawable/blue_button"
                 android:text="@string/transform"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"
