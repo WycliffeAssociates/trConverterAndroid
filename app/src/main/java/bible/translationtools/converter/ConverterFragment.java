@@ -1,33 +1,38 @@
-package org.wycliffeassociates.converter;
+package bible.translationtools.converter;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import org.wycliffeassociates.trConverter.Converter;
-import org.wycliffeassociates.trConverter.IConverter;
-import org.wycliffeassociates.trConverter.Mode;
+import bible.translationtools.converterlib.Converter;
+import bible.translationtools.converterlib.IConverter;
+import bible.translationtools.converterlib.Mode;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConverterFragment extends Fragment implements ConverterTask.ConverterResultCallback,
-        AnalyserTask.AnaliserResultCallback {
+        AnalyserTask.AnaliserResultCallback, MigrationTask.MigrationResultCallback,
+        MigrationDialogFragment.MigrationCallback {
+
+    private MainActivity activity;
 
     private boolean isAnalyzing = false;
     private boolean isConverting = false;
+    private boolean isMigrating = false;
     private String messageText = "";
     private String buttonText = "";
 
     private Button button;
     private ProgressBar progress;
     private TextView messageView;
+    private ImageView migrateButton;
 
     private ListView listView;
     private ModeListAdapter listAdapter;
@@ -57,10 +62,13 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        activity = (MainActivity)getActivity();
+
         button = view.findViewById(R.id.convert);
         progress = view.findViewById(R.id.progressBar);
         listView = view.findViewById(R.id.listView);
         messageView = view.findViewById(R.id.messageView);
+        migrateButton = view.findViewById(R.id.migrate);
 
         buttonText = getString(R.string.analyze); // Default value
 
@@ -75,6 +83,50 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    protected void init() {
+        if(!modes.isEmpty()) {
+            buttonText = getString(R.string.convert);
+            listAdapter = new ModeListAdapter(activity, modes);
+            listView.setAdapter(listAdapter);
+        }
+
+        if(isAnalyzing || isConverting || isMigrating) {
+            button.setEnabled(false);
+            progress.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
+        }
+
+        button.setText(buttonText);
+        messageView.setText(messageText);
+
+        String dir = activity.bttrDir().getAbsolutePath();
+        if(activity.trDir().exists()) {
+            migrateButton.setVisibility(View.VISIBLE);
+            migrateButton.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v) {
+                    showMigrationDialog();
+                }
+            });
+        } else {
+            migrateButton.setVisibility(View.GONE);
+        }
+
+        try {
+            converter = new Converter(dir);
+            button.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v) {
+                    if (modes.isEmpty())
+                        analyze();
+                    else
+                        convert();
+                }
+            });
+        } catch (Exception e) {
+            Toast.makeText(getActivity().getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
     }
 
     protected void analyze() {
@@ -98,6 +150,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
         button.setText(buttonText);
         progress.setVisibility(View.VISIBLE);
         messageView.setText(messageText);
+        migrateButton.setVisibility(View.GONE);
         return null;
     }
 
@@ -111,6 +164,10 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
         button.setText(buttonText);
         listView.setVisibility(View.VISIBLE);
         progress.setVisibility(View.GONE);
+
+        if(activity.trDir().exists()) {
+            migrateButton.setVisibility(View.VISIBLE);
+        }
 
         if(modes.isEmpty()) {
             Toast.makeText(getActivity().getApplicationContext(), R.string.empty_modes, Toast.LENGTH_SHORT).show();
@@ -129,7 +186,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
                 messageView.setText(R.string.set_modes);
                 messageView.setTextColor(Color.RED);
             }
-            listAdapter = new ModeListAdapter((MainActivity) getActivity(), modes);
+            listAdapter = new ModeListAdapter(activity, modes);
             listView.setAdapter(listAdapter);
         }
         return null;
@@ -170,6 +227,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
         listView.setVisibility(View.GONE);
         progress.setVisibility(View.VISIBLE);
         messageView.setText(messageText);
+        migrateButton.setVisibility(View.GONE);
         return null;
     }
 
@@ -184,6 +242,10 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
         button.setText(buttonText);
         progress.setVisibility(View.GONE);
 
+        if(activity.trDir().exists()) {
+            migrateButton.setVisibility(View.VISIBLE);
+        }
+
         if(result >= 0) {
             messageText = getString(R.string.conversion_complete, result);
             messageView.setText(messageText);
@@ -196,43 +258,64 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
         return null;
     }
 
-    protected void init() {
-        if(!modes.isEmpty()) {
-            buttonText = getString(R.string.convert);
-            listAdapter = new ModeListAdapter((MainActivity) getActivity(), modes);
-            listView.setAdapter(listAdapter);
+    @Override
+    public Void startMigration() {
+        System.out.println("Migration started.....");
+        if(activity.bttrDir().exists()) {
+            messageText = getString(R.string.migration_error);
+            messageView.setText(messageText);
+            return null;
         }
 
-        if(isAnalyzing || isConverting) {
-            button.setEnabled(false);
-            progress.setVisibility(View.VISIBLE);
-            listView.setVisibility(View.GONE);
+        if(activity.trDir().renameTo(activity.bttrDir())) {
+            messageText = getString(R.string.migration_success);
+            messageView.setTextColor(getResources().getColor(R.color.colorAccent));
         }
 
+        return null;
+    }
+
+    @Override
+    public Void migrationStarted() {
+        isMigrating = true;
+        messageText = "";
+        buttonText = getString(R.string.migrating);
+
+        button.setEnabled(false);
         button.setText(buttonText);
+        progress.setVisibility(View.VISIBLE);
         messageView.setText(messageText);
+        migrateButton.setVisibility(View.GONE);
+        return null;
+    }
 
-        try {
-            String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/TranslationRecorder";
-            converter = new Converter(dir);
-
-            button.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View v) {
-                    if (modes.isEmpty())
-                        analyze();
-                    else
-                        convert();
-                }
-            });
-        } catch (Exception e) {
-            Toast.makeText(getActivity().getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-        }
+    @Override
+    public Void migrationDone() {
+        isMigrating = false;
+        button.setEnabled(true);
+        buttonText = getString(R.string.analyze);
+        progress.setVisibility(View.GONE);
+        init();
+        System.out.println("Migrated!");
+        return null;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         analyze();
+    }
+
+    private void showMigrationDialog() {
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        MigrationDialogFragment dialog = new MigrationDialogFragment();
+        dialog.setMigrationCallback(this);
+        dialog.show(fm, "migrate");
+    }
+
+    @Override
+    public void onMigrate() {
+        MigrationTask migrationTask = new MigrationTask(ConverterFragment.this);
+        migrationTask.execute();
     }
 }

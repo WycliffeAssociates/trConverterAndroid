@@ -1,9 +1,10 @@
-package org.wycliffeassociates.converter;
+package bible.translationtools.converter;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -11,7 +12,12 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
+import java.io.File;
+
 public class MainActivity extends FragmentActivity {
+
+    private String trDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/TranslationRecorder";
+    private String bttrDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/BttRecorder";
 
     private Fragment fragment;
 
@@ -47,5 +53,13 @@ public class MainActivity extends FragmentActivity {
         } else {
             Toast.makeText(getApplicationContext(), R.string.grant_permission, Toast.LENGTH_LONG).show();
         }
+    }
+
+    public File trDir() {
+        return new File(trDirPath);
+    }
+
+    public File bttrDir() {
+        return new File(bttrDirPath);
     }
 }

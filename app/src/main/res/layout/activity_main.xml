@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.wycliffeassociates.converter.MainActivity">
+    tools:context="org.wycliffeassociates.converter.bible.wycliffeassociates.converter.MainActivity">
 
     <TextView
             android:id="@+id/textView"

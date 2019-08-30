@@ -1,4 +1,4 @@
-package org.wycliffeassociates.trconverter;
+package bible.translationtools.converter;
 
 import org.junit.Test;
 

@@ -88,15 +88,15 @@
 
         <Button
                 android:id="@+id/transform"
-                style="@android:style/Widget.Button"
                 android:layout_width="164dp"
                 android:layout_height="62dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/blue_button"
+                android:paddingBottom="3dp"
+                android:background="@drawable/round_corner_secondary"
                 android:text="@string/transform"
                 android:textAlignment="center"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"

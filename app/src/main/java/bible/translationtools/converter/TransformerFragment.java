@@ -1,19 +1,20 @@
-package org.wycliffeassociates.converter;
+package bible.translationtools.converter;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import org.wycliffeassociates.trConverter.ITransformer;
-import org.wycliffeassociates.trConverter.Transformer;
+import bible.translationtools.converterlib.ITransformer;
+import bible.translationtools.converterlib.Transformer;
 
 public class TransformerFragment extends Fragment implements TransformerTask.TransformerResultCallback {
+
+    private MainActivity activity;
 
     private String project;
     private String language;
@@ -83,6 +84,8 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        activity = (MainActivity)getActivity();
+
         button = view.findViewById(R.id.transform);
         progress = view.findViewById(R.id.progressBar);
         projectTitle = view.findViewById(R.id.titleView);
@@ -111,7 +114,7 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
     }
 
     protected void transform() {
-        String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/TranslationRecorder";
+        String dir = activity.bttrDir().getAbsolutePath();
         newLanguage = languageEdit.getText().toString().trim();
         newVersion = versionEdit.getText().toString().trim().toLowerCase();
 

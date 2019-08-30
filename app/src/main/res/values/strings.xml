@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">tRConverter</string>
-    <string name="app_info">ver.1.5.0</string>
+    <string name="app_name">BTT Converter</string>
+    <string name="app_info">BTT Converter v.1.6.0</string>
     <string name="convert">Convert</string>
     <string name="analyze">Analyze</string>
     <string name="transform">Transform</string>
@@ -19,4 +19,11 @@
     <string name="project">project</string>
     <string name="enter_language">Enter Language Code (en, fr, es-419, ...)</string>
     <string name="enter_version">Enter Version Code (ulb, udb, reg, ...)</string>
+    <string name="migrate">Migrate to BTT Recorder</string>
+    <string name="migrate_message">We found TranslationRecorder directory on your device. If you have BTT Recorder app installed, it is recommended to rename this directory to BttRecorder.</string>
+    <string name="proceed">Proceed</string>
+    <string name="cancel">Cancel</string>
+    <string name="migrating">Migrating</string>
+    <string name="migration_error">Migration failed. BttRecorder directory is already on your device.</string>
+    <string name="migration_success">Migration has been successfully completed!</string>
 </resources>

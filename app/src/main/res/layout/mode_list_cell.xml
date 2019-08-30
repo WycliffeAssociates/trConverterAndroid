@@ -2,7 +2,6 @@
 <android.support.constraint.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -76,6 +75,7 @@
             android:layout_height="35dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
+            android:paddingBottom="3dp"
             app:layout_constraintStart_toEndOf="@+id/divider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -84,9 +84,8 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            style="@android:style/Widget.Button"
-            android:background="@drawable/blue_button"
-            android:textColor="#fff"
+            android:background="@drawable/round_corner_secondary_small"
+            android:textColor="@color/white"
             android:textStyle="bold" />
 
 
