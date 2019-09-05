@@ -3,9 +3,9 @@ package bible.translationtools.converter;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,6 +109,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
                     showMigrationDialog();
                 }
             });
+            showMigrationDialog();
         } else {
             migrateButton.setVisibility(View.GONE);
         }
@@ -192,11 +193,6 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
         return null;
     }
 
-    @Override
-    public Integer startConversion() {
-        return converter.execute();
-    }
-
     protected void convert() {
         Boolean hasEmptyModes = false;
         for (Mode m: modes) {
@@ -214,6 +210,11 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
         } else {
             Toast.makeText(getActivity().getApplicationContext(), R.string.set_modes, Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public Integer startConversion() {
+        return converter.execute();
     }
 
     @Override
@@ -259,6 +260,12 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
     }
 
     @Override
+    public void onMigrate() {
+        MigrationTask migrationTask = new MigrationTask(ConverterFragment.this);
+        migrationTask.execute();
+    }
+
+    @Override
     public Void startMigration() {
         System.out.println("Migration started.....");
         if(activity.bttrDir().exists()) {
@@ -296,14 +303,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
         buttonText = getString(R.string.analyze);
         progress.setVisibility(View.GONE);
         init();
-        System.out.println("Migrated!");
         return null;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        analyze();
     }
 
     private void showMigrationDialog() {
@@ -314,8 +314,8 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
     }
 
     @Override
-    public void onMigrate() {
-        MigrationTask migrationTask = new MigrationTask(ConverterFragment.this);
-        migrationTask.execute();
+    public void onResume() {
+        super.onResume();
+        analyze();
     }
 }
