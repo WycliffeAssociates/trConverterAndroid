@@ -1,6 +1,6 @@
 apply plugin: "com.android.application"
 
-ext.trc_version = "0.4.0"
+ext.trc_version = "0.4.1"
 
 configurations.all {
     resolutionStrategy.dependencySubstitution {
@@ -15,8 +15,8 @@ android {
         applicationId "bible.translationtools.converter"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 20
-        versionName "1.6.1"
+        versionCode 21
+        versionName "1.6.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -53,6 +53,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation "com.github.WycliffeAssociates:tR_Converter:$trc_version"
+    implementation "com.toptoche.searchablespinner:searchablespinnerlibrary:1.3.1"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     androidTestImplementation 'androidx.test:runner:1.1.0'
     testImplementation "junit:junit:4.12"

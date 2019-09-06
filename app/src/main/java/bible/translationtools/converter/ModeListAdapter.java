@@ -95,9 +95,16 @@ public class ModeListAdapter extends BaseAdapter {
             viewHolder.editButton.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v) {
                     FragmentTransaction ft = fragmentManager.beginTransaction();
-                    ft.replace(R.id.fragment_container,
-                            TransformerFragment.newInstance(item.toString(), item.language, item.version, item.book));
-                    ft.setTransition(FragmentTransaction.TRANSIT_ENTER_MASK);
+                    ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+                    ft.replace(
+                            R.id.fragment_container,
+                            TransformerFragment.newInstance(
+                                    item.toString(),
+                                    item.language,
+                                    item.version,
+                                    item.book
+                            )
+                    );
                     ft.addToBackStack(null);
                     ft.commit();
                 }

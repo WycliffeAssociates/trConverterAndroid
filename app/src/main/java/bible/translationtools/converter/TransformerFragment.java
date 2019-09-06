@@ -11,28 +11,33 @@ import android.view.ViewGroup;
 import android.widget.*;
 import bible.translationtools.converterlib.ITransformer;
 import bible.translationtools.converterlib.Transformer;
+import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 public class TransformerFragment extends Fragment implements TransformerTask.TransformerResultCallback {
 
     private MainActivity activity;
 
     private String project;
-    private String language;
-    private String version;
+    private Language language;
+    private Version version;
     private String book;
     private boolean isTransforming = false;
     private String messageText = "";
     private String buttonText = "";
 
-    private String newLanguage;
-    private String newVersion;
+    private Language newLanguage;
+    private Version newVersion;
 
     private Button button;
     private ProgressBar progress;
     private TextView projectTitle;
     private TextView messageView;
-    private EditText languageEdit;
-    private EditText versionEdit;
+    private Spinner versionSpinner;
+    private SearchableSpinner languageSpinner;
+
+    private LanguageRepository langRepo;
+    private ArrayAdapter<Version> versionsAdapter;
+    private ArrayAdapter<Language> languageAdapter;
 
     protected ITransformer transformer;
 
@@ -51,8 +56,19 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
     private void readBundle(Bundle bundle) {
         if (bundle != null) {
             project = bundle.getString("project");
-            language = bundle.getString("language");
-            version = bundle.getString("version");
+
+            Language lang = langRepo.getLang(bundle.getString("language"));
+            language = new Language(
+                    lang.slug,
+                    lang.name,
+                    lang.angName
+            );
+
+            Version ver = VersionRepository.getVersion(bundle.getString("version"));
+            version = new Version(
+                    ver.slug,
+                    ver.name
+            );
             book = bundle.getString("book");
         }
     }
@@ -73,9 +89,9 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        readBundle(getArguments());
+        langRepo = new LanguageRepository(getContext());
 
-        System.out.println(language);
+        readBundle(getArguments());
 
         return inflater.inflate(R.layout.transformer_fragment, container, false);
     }
@@ -89,11 +105,12 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
         button = view.findViewById(R.id.transform);
         progress = view.findViewById(R.id.progressBar);
         projectTitle = view.findViewById(R.id.titleView);
-        languageEdit = view.findViewById(R.id.languageEdit);
-        versionEdit = view.findViewById(R.id.versionEdit);
+        languageSpinner = view.findViewById(R.id.languages);
+        versionSpinner = view.findViewById(R.id.versions);
         messageView = view.findViewById(R.id.messageView);
 
         buttonText = getString(R.string.transform); // Default value
+        languageSpinner.setTitle(getString(R.string.select_language));
 
         init();
     }
@@ -115,14 +132,23 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
 
     protected void transform() {
         String dir = activity.bttrDir().getAbsolutePath();
-        newLanguage = languageEdit.getText().toString().trim();
-        newVersion = versionEdit.getText().toString().trim().toLowerCase();
+        newLanguage = (Language) languageSpinner.getSelectedItem();
+        newVersion = (Version) versionSpinner.getSelectedItem();
 
-        newLanguage = !newLanguage.isEmpty() && !newLanguage.equals(language) ? newLanguage : null;
-        newVersion = !newVersion.isEmpty() && !newVersion.equals(version) ? newVersion : null;
+        newLanguage = !newLanguage.equals(language) ? newLanguage : null;
+        newVersion = !newVersion.equals(version) ? newVersion : null;
+
+        String newLanguageSlug = newLanguage != null ? newLanguage.slug : null;
+        String newVersionSlug = newVersion != null ? newVersion.slug : null;
 
         try {
-            transformer = new Transformer(dir, language, newLanguage, null, newVersion);
+            transformer = new Transformer(
+                    dir,
+                    language.slug,
+                    newLanguageSlug,
+                    null,
+                    newVersionSlug
+            );
             TransformerTask transformerTask = new TransformerTask(TransformerFragment.this);
             transformerTask.execute();
         } catch (Exception e) {
@@ -139,8 +165,8 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
 
         button.setEnabled(false);
         button.setText(buttonText);
-        languageEdit.setVisibility(View.GONE);
-        versionEdit.setVisibility(View.GONE);
+        languageSpinner.setVisibility(View.GONE);
+        versionSpinner.setVisibility(View.GONE);
         progress.setVisibility(View.VISIBLE);
         messageView.setText(messageText);
         return null;
@@ -154,8 +180,8 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
         button.setEnabled(true);
         button.setText(buttonText);
         progress.setVisibility(View.GONE);
-        languageEdit.setVisibility(View.VISIBLE);
-        versionEdit.setVisibility(View.VISIBLE);
+        languageSpinner.setVisibility(View.VISIBLE);
+        versionSpinner.setVisibility(View.VISIBLE);
 
         if(result >= 0) {
             messageText = getString(R.string.transformation_complete, result);
@@ -164,15 +190,15 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
             language = newLanguage != null ? newLanguage : language;
             version = newVersion != null ? newVersion : version;
             project = String.format("%s | %s | %s",
-                    language, version, book);
+                    language.slug, version.slug, book);
 
             projectTitle.setText(project);
-            languageEdit.setText(language);
-            versionEdit.setText(version);
+            languageSpinner.setSelection(languageAdapter.getPosition(language));
+            versionSpinner.setSelection(versionsAdapter.getPosition(version));
 
             getArguments().putString("project", project);
-            getArguments().putString("language", language);
-            getArguments().putString("version", version);
+            getArguments().putString("language", language.slug);
+            getArguments().putString("version", version.slug);
         } else {
             messageText = getString(R.string.error_occurred);
             messageView.setText(messageText);
@@ -183,15 +209,31 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
     }
 
     protected void init() {
+        versionsAdapter = new VersionSpinnerAdapter(
+                getContext(),
+                android.R.layout.simple_spinner_item,
+                VersionRepository.versionList);
+        versionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        versionSpinner.setAdapter(versionsAdapter);
+
+        LanguageRepository languageRepository = new LanguageRepository(getContext());
+        languageAdapter = new LanguageSpinnerAdapter(
+                getContext(),
+                android.R.layout.simple_spinner_item,
+                languageRepository.languageList
+        );
+        languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        languageSpinner.setAdapter(languageAdapter);
+
         projectTitle.setText(project);
-        languageEdit.setText(language);
-        versionEdit.setText(version);
+        languageSpinner.setSelection(languageAdapter.getPosition(language));
+        versionSpinner.setSelection(versionsAdapter.getPosition(version));
 
         if(isTransforming) {
             button.setEnabled(false);
             progress.setVisibility(View.VISIBLE);
-            languageEdit.setVisibility(View.GONE);
-            versionEdit.setVisibility(View.GONE);
+            languageSpinner.setVisibility(View.GONE);
+            versionSpinner.setVisibility(View.GONE);
         }
 
         button.setText(buttonText);

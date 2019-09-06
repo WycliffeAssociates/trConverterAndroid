@@ -26,4 +26,6 @@
     <string name="migrating">Migrating</string>
     <string name="migration_error">Migration failed. BttRecorder directory is already on your device.</string>
     <string name="migration_success">Migration has been successfully completed!</string>
+    <string name="select_version">Select version</string>
+    <string name="select_language">Select language</string>
 </resources>
