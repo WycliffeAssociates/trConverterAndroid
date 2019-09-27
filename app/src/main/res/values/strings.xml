@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">BTT Converter</string>
-    <string name="app_info">BTT Converter v.1.6.2</string>
+    <string name="app_info">BTT Converter v.1.6.3</string>
     <string name="convert">Convert</string>
     <string name="analyze">Analyze</string>
     <string name="transform">Transform</string>
@@ -28,4 +28,5 @@
     <string name="migration_success">Migration has been successfully completed!</string>
     <string name="select_version">Select version</string>
     <string name="select_language">Select language</string>
+    <string name="all_books_check">Transform all books under %1$s</string>
 </resources>

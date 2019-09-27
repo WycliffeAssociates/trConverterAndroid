@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import bible.translationtools.converterlib.Converter;
 import bible.translationtools.converterlib.IConverter;
-import bible.translationtools.converterlib.Mode;
+import bible.translationtools.converterlib.Project;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
     private ListView listView;
     private ModeListAdapter listAdapter;
 
-    private List<Mode> modes = new ArrayList<>();
+    private List<Project> projects = new ArrayList<>();
     protected IConverter converter;
 
     @Override
@@ -86,9 +86,9 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
     }
 
     protected void init() {
-        if(!modes.isEmpty()) {
+        if(!projects.isEmpty()) {
             buttonText = getString(R.string.convert);
-            listAdapter = new ModeListAdapter(activity, modes);
+            listAdapter = new ModeListAdapter(activity, projects);
             listView.setAdapter(listAdapter);
         }
 
@@ -118,7 +118,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
             converter = new Converter(dir);
             button.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v) {
-                    if (modes.isEmpty())
+                    if (projects.isEmpty())
                         analyze();
                     else
                         convert();
@@ -160,7 +160,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
         isAnalyzing = false;
         buttonText = getString(R.string.convert);
 
-        modes = converter.getModes();
+        projects = converter.getProjects();
         button.setEnabled(true);
         button.setText(buttonText);
         listView.setVisibility(View.VISIBLE);
@@ -170,12 +170,12 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
             migrateButton.setVisibility(View.VISIBLE);
         }
 
-        if(modes.isEmpty()) {
+        if(projects.isEmpty()) {
             Toast.makeText(getActivity().getApplicationContext(), R.string.empty_modes, Toast.LENGTH_SHORT).show();
             button.setText(R.string.analyze);
         } else {
             Boolean hasEmptyModes = false;
-            for (Mode m: modes) {
+            for (Project m: projects) {
                 if (m.mode.isEmpty())
                 {
                     hasEmptyModes = true;
@@ -187,7 +187,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
                 messageView.setText(R.string.set_modes);
                 messageView.setTextColor(Color.RED);
             }
-            listAdapter = new ModeListAdapter(activity, modes);
+            listAdapter = new ModeListAdapter(activity, projects);
             listView.setAdapter(listAdapter);
         }
         return null;
@@ -195,7 +195,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
 
     protected void convert() {
         Boolean hasEmptyModes = false;
-        for (Mode m: modes) {
+        for (Project m: projects) {
             if (m.mode.isEmpty())
             {
                 hasEmptyModes = true;
@@ -204,7 +204,7 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
         }
 
         if (!hasEmptyModes) {
-            converter.setModes(modes);
+            converter.setProjects(projects);
             ConverterTask converterTask = new ConverterTask(ConverterFragment.this);
             converterTask.execute();
         } else {
@@ -236,8 +236,8 @@ public class ConverterFragment extends Fragment implements ConverterTask.Convert
     public Void conversionDone(final Integer result) {
         isConverting = false;
         buttonText = getString(R.string.analyze);
-        modes.clear();
-        converter.setModes(modes);
+        projects.clear();
+        converter.setProjects(projects);
         converter.setDateTimeDir();
         button.setEnabled(true);
         button.setText(buttonText);

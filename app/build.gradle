@@ -1,6 +1,6 @@
 apply plugin: "com.android.application"
 
-ext.trc_version = "0.4.1"
+ext.trc_version = "0.5.0"
 
 configurations.all {
     resolutionStrategy.dependencySubstitution {
@@ -15,8 +15,8 @@ android {
         applicationId "bible.translationtools.converter"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 21
-        versionName "1.6.2"
+        versionCode 22
+        versionName "1.6.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {

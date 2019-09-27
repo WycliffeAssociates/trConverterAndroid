@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import bible.translationtools.converterlib.ITransformer;
+import bible.translationtools.converterlib.Project;
 import bible.translationtools.converterlib.Transformer;
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
@@ -17,7 +18,8 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
 
     private MainActivity activity;
 
-    private String project;
+    private String projectName;
+    private String projectsName; // language and version
     private Language language;
     private Version version;
     private String book;
@@ -34,6 +36,7 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
     private TextView messageView;
     private Spinner versionSpinner;
     private SearchableSpinner languageSpinner;
+    private CheckBox allBooksCheckbox;
 
     private LanguageRepository langRepo;
     private ArrayAdapter<Version> versionsAdapter;
@@ -41,12 +44,12 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
 
     protected ITransformer transformer;
 
-    public static TransformerFragment newInstance(String project, String language, String version, String book) {
+    public static TransformerFragment newInstance(Project project) {
         Bundle bundle = new Bundle();
-        bundle.putString("project", project);
-        bundle.putString("language", language);
-        bundle.putString("version", version);
-        bundle.putString("book", book);
+        bundle.putString("projectName", project.toString());
+        bundle.putString("language", project.language);
+        bundle.putString("version", project.version);
+        bundle.putString("book", project.book);
 
         TransformerFragment fragment = new TransformerFragment();
         fragment.setArguments(bundle);
@@ -55,7 +58,8 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
 
     private void readBundle(Bundle bundle) {
         if (bundle != null) {
-            project = bundle.getString("project");
+            projectName = bundle.getString("projectName");
+            projectsName = String.format("%s | %s", bundle.getString("language"), bundle.getString("version"));
 
             Language lang = langRepo.getLang(bundle.getString("language"));
             language = new Language(
@@ -108,6 +112,7 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
         languageSpinner = view.findViewById(R.id.languages);
         versionSpinner = view.findViewById(R.id.versions);
         messageView = view.findViewById(R.id.messageView);
+        allBooksCheckbox = view.findViewById(R.id.allBooksCheckbox);
 
         buttonText = getString(R.string.transform); // Default value
         languageSpinner.setTitle(getString(R.string.select_language));
@@ -141,10 +146,14 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
         String newLanguageSlug = newLanguage != null ? newLanguage.slug : null;
         String newVersionSlug = newVersion != null ? newVersion.slug : null;
 
+        boolean transformAll = allBooksCheckbox.isChecked();
+
         try {
             transformer = new Transformer(
                     dir,
                     language.slug,
+                    version.slug,
+                    (!transformAll ? book : null),
                     newLanguageSlug,
                     null,
                     newVersionSlug
@@ -167,6 +176,7 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
         button.setText(buttonText);
         languageSpinner.setVisibility(View.GONE);
         versionSpinner.setVisibility(View.GONE);
+        allBooksCheckbox.setVisibility(View.GONE);
         progress.setVisibility(View.VISIBLE);
         messageView.setText(messageText);
         return null;
@@ -189,14 +199,15 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
 
             language = newLanguage != null ? newLanguage : language;
             version = newVersion != null ? newVersion : version;
-            project = String.format("%s | %s | %s",
-                    language.slug, version.slug, book);
+            projectName = String.format("%s | %s | %s", language.slug, version.slug, book);
+            projectsName = String.format("%s | %s", language.slug, version.slug);
 
-            projectTitle.setText(project);
+            projectTitle.setText(projectName);
             languageSpinner.setSelection(languageAdapter.getPosition(language));
             versionSpinner.setSelection(versionsAdapter.getPosition(version));
+            allBooksCheckbox.setText(getString(R.string.all_books_check, projectsName));
 
-            getArguments().putString("project", project);
+            getArguments().putString("projectName", projectName);
             getArguments().putString("language", language.slug);
             getArguments().putString("version", version.slug);
         } else {
@@ -225,7 +236,7 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
         languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         languageSpinner.setAdapter(languageAdapter);
 
-        projectTitle.setText(project);
+        projectTitle.setText(projectName);
         languageSpinner.setSelection(languageAdapter.getPosition(language));
         versionSpinner.setSelection(versionsAdapter.getPosition(version));
 
@@ -238,6 +249,8 @@ public class TransformerFragment extends Fragment implements TransformerTask.Tra
 
         button.setText(buttonText);
         messageView.setText(messageText);
+
+        allBooksCheckbox.setText(getString(R.string.all_books_check, projectsName));
 
         button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {

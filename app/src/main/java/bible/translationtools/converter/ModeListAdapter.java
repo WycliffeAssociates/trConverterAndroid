@@ -9,29 +9,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import bible.translationtools.converterlib.Mode;
+import bible.translationtools.converterlib.Project;
 
 import java.util.List;
 
 public class ModeListAdapter extends BaseAdapter {
-    List<Mode> modes;
+    List<Project> projects;
     LayoutInflater layoutInflater;
     FragmentManager fragmentManager;
 
-    public ModeListAdapter(MainActivity activity, List<Mode> modes) {
-        this.modes = modes;
+    public ModeListAdapter(MainActivity activity, List<Project> projects) {
+        this.projects = projects;
         layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         fragmentManager = activity.getSupportFragmentManager();
     }
 
     @Override
     public int getCount() {
-        return modes.size();
+        return projects.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return modes.get(position);
+        return projects.get(position);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ModeListAdapter extends BaseAdapter {
 
     @Override
     public int getViewTypeCount() {
-        return modes.size();
+        return projects.size();
     }
 
     @Override
@@ -67,7 +67,7 @@ public class ModeListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final ViewHolder viewHolder;
-        final Mode item = modes.get(position);
+        final Project item = projects.get(position);
         Boolean isEmpty = item.mode.isEmpty();
 
         if (convertView == null) {
@@ -90,7 +90,7 @@ public class ModeListAdapter extends BaseAdapter {
 
         viewHolder.projectText.setText(item.toString());
         if (!viewHolder.isEmpty) {
-            viewHolder.projectText.setTextColor(Color.GRAY);
+            viewHolder.projectText.setTextColor(item.pending ? Color.RED : Color.GRAY);
 
             viewHolder.editButton.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v) {
@@ -98,12 +98,7 @@ public class ModeListAdapter extends BaseAdapter {
                     ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
                     ft.replace(
                             R.id.fragment_container,
-                            TransformerFragment.newInstance(
-                                    item.toString(),
-                                    item.language,
-                                    item.version,
-                                    item.book
-                            )
+                            TransformerFragment.newInstance(item)
                     );
                     ft.addToBackStack(null);
                     ft.commit();
@@ -124,6 +119,7 @@ public class ModeListAdapter extends BaseAdapter {
         viewHolder.verseButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 item.mode = "verse";
+                item.pending = true;
                 viewHolder.projectText.setTextColor(Color.BLACK);
                 viewHolder.verseButton.setTextColor(Color.BLACK);
                 viewHolder.chunkButton.setTextColor(Color.BLACK);
@@ -135,6 +131,7 @@ public class ModeListAdapter extends BaseAdapter {
         viewHolder.chunkButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 item.mode = "chunk";
+                item.pending = true;
                 viewHolder.projectText.setTextColor(Color.BLACK);
                 viewHolder.verseButton.setTextColor(Color.BLACK);
                 viewHolder.chunkButton.setTextColor(Color.BLACK);
