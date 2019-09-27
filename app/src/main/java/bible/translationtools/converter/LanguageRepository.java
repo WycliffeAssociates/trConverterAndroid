@@ -24,7 +24,6 @@ public class LanguageRepository {
                 return l;
             }
         }
-
         return null;
     }
 
@@ -41,7 +40,6 @@ public class LanguageRepository {
             e.printStackTrace();
             return null;
         }
-
         return json;
     }
 
