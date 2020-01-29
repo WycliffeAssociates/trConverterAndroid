@@ -1,0 +1,32 @@
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
+    <string name="app_name">BTT Converter</string>
+    <string name="app_info">BTT Converter v.1.6.4</string>
+    <string name="convert">Конвертировать</string>
+    <string name="analyze">Анализировать</string>
+    <string name="transform">Преобразовать</string>
+    <string name="processing">В процессе…</string>
+    <string name="analyzing">Анализация…</string>
+    <string name="grant_permission">Вы должны предоставить права на запись файлов!</string>
+    <string name="empty_modes">Аудио файлы не найдены!</string>
+    <string name="set_modes">Установите режим книгам, помеченным красным и нажмите Конвертировать!</string>
+    <string name="conversion_complete">Конвертация завершена: <xliff:g example="25" id="number">%1$d</xliff:g> файлов было затронуто.</string>
+    <string name="transformation_complete">Преобразование завершено: <xliff:g example="25" id="number">%1$d</xliff:g> файлов было затронуто.</string>
+    <string name="error_occurred">Произошла ошибка.</string>
+    <string name="set_fields">Убедитесь, что вы правильно заполнили все поля</string>
+    <string name="verse">стих</string>
+    <string name="chunk">отрывок</string>
+    <string name="edit">редактировать</string>
+    <string name="project">проект</string>
+    <string name="enter_language">Введите код языка (en, fr, es-419, …)</string>
+    <string name="enter_version">Введите код версии (ulb, udb, reg, …)</string>
+    <string name="migrate">Миграция в BTT Recorder</string>
+    <string name="migrate_message">Мы обнаружили папку TranslationRecorder на вашем устройстве. Если вы установили приложение BTT Recorder, рекомендуется переменовать эту папку в BttRecorder.</string>
+    <string name="proceed">Выполнить</string>
+    <string name="cancel">Отмена</string>
+    <string name="migrating">Миграция</string>
+    <string name="migration_error">Миграция не удалась. Папка BttRecorder уже есть на вашем устройстве.</string>
+    <string name="migration_success">Миграция завершена успешно!</string>
+    <string name="select_version">Выберите версию</string>
+    <string name="select_language">Выберите язык</string>
+    <string name="all_books_check">Преобразовать все книги в проекте (<xliff:g example="en | ulb" id="project">%1$s</xliff:g>)</string>
+</resources>
