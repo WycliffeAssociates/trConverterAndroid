@@ -1,24 +1,24 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">BTT Converter</string>
-    <string name="app_info">BTT Converter v.1.6.3</string>
+    <string name="app_info">BTT Converter v.1.6.4</string>
     <string name="convert">Convert</string>
     <string name="analyze">Analyze</string>
     <string name="transform">Transform</string>
-    <string name="processing">Processing&#8230;</string>
-    <string name="analyzing">Analyzing&#8230;</string>
+    <string name="processing">Processing…</string>
+    <string name="analyzing">Analyzing…</string>
     <string name="grant_permission">You have to grant write permission!</string>
     <string name="empty_modes">No audio files found!</string>
     <string name="set_modes">Set mode for books marked in red and tap Convert!</string>
-    <string name="conversion_complete">Conversion complete: %1$d files have been affected.</string>
-    <string name="transformation_complete">Transformation complete: %1$d files have been affected.</string>
+    <string name="conversion_complete">Conversion complete: <xliff:g example="25" id="number">%1$d</xliff:g> files have been affected.</string>
+    <string name="transformation_complete">Transformation complete: <xliff:g example="25" id="number">%1$d</xliff:g> files have been affected.</string>
     <string name="error_occurred">An error occurred.</string>
-    <string name="set_fields">Make sure that you have properly all the values</string>
+    <string name="set_fields">Make sure that you have properly set all the values</string>
     <string name="verse">verse</string>
     <string name="chunk">chunk</string>
     <string name="edit">edit</string>
     <string name="project">project</string>
-    <string name="enter_language">Enter Language Code (en, fr, es-419, ...)</string>
-    <string name="enter_version">Enter Version Code (ulb, udb, reg, ...)</string>
+    <string name="enter_language">Enter Language Code (en, fr, es-419, …)</string>
+    <string name="enter_version">Enter Version Code (ulb, udb, reg, …)</string>
     <string name="migrate">Migrate to BTT Recorder</string>
     <string name="migrate_message">We found TranslationRecorder directory on your device. If you have BTT Recorder app installed, it is recommended to rename this directory to BttRecorder.</string>
     <string name="proceed">Proceed</string>
@@ -28,5 +28,5 @@
     <string name="migration_success">Migration has been successfully completed!</string>
     <string name="select_version">Select version</string>
     <string name="select_language">Select language</string>
-    <string name="all_books_check">Transform all books under %1$s</string>
+    <string name="all_books_check">Transform all books under project (<xliff:g example="en | ulb" id="project">%1$s</xliff:g>)</string>
 </resources>
