@@ -1,45 +1,39 @@
-package bible.translationtools.converter;
+package bible.translationtools.converter
 
-import android.os.AsyncTask;
-import androidx.fragment.app.Fragment;
+import android.os.AsyncTask
+import androidx.fragment.app.Fragment
 
 /**
  * Created by mXaln on 11/11/17.
  */
+class ConverterTask(c: Fragment?) : AsyncTask<Void?, Int?, Int?>() {
+    var callback: ConverterResultCallback
 
-public final class ConverterTask extends AsyncTask<Void, Integer, Integer> {
-
-    ConverterResultCallback callback;
-
-    public ConverterTask(Fragment c) {
-        this.callback = (ConverterResultCallback) c;
+    init {
+        this.callback = c as ConverterResultCallback
     }
 
-    @Override
-    protected Integer doInBackground(Void... params) {
-        return callback.startConversion();
+    override fun doInBackground(vararg params: Void?): Int {
+        return callback.startConversion()
     }
 
-    @Override
-    protected void onPreExecute() {
-        callback.conversionStarted();
-        super.onPreExecute();
+    override fun onPreExecute() {
+        callback.conversionStarted()
+        super.onPreExecute()
     }
 
-    @Override
-    protected void onProgressUpdate(Integer... values) {
-        super.onProgressUpdate(values);
+    override fun onProgressUpdate(vararg values: Int?) {
+        super.onProgressUpdate(*values)
     }
 
-    @Override
-    protected void onPostExecute(Integer result) {
-        callback.conversionDone(result);
-        super.onPostExecute(result);
+    override fun onPostExecute(result: Int?) {
+        callback.conversionDone(result)
+        super.onPostExecute(result)
     }
 
-    public interface ConverterResultCallback {
-        Integer startConversion();
-        Void conversionStarted();
-        Void conversionDone(Integer result);
+    interface ConverterResultCallback {
+        fun startConversion(): Int
+        fun conversionStarted()
+        fun conversionDone(result: Int?)
     }
 }

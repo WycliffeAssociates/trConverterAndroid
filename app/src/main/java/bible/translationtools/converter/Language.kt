@@ -1,24 +1,22 @@
-package bible.translationtools.converter;
+package bible.translationtools.converter
 
-public class Language {
-    String slug;
-    String name;
-    String angName;
-
-    public Language(String slug, String name, String angName) {
-        this.slug = slug;
-        this.name = name;
-        this.angName = angName;
+class Language(val slug: String, val name: String, val angName: String) {
+    override fun equals(other: Any?): Boolean {
+        return this.slug == (other as Language).slug
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return this.slug.equals(((Language) obj).slug);
+    override fun toString(): String {
+        val name = String.format("[ %s ] %s", this.slug, this.name)
+        val angName = if (this.angName != this.name && this.angName != "") {
+            " ( ${this.angName} )"
+        } else ""
+        return name + angName
     }
 
-    @Override
-    public String toString() {
-        return String.format("[ %s ] %s", this.slug, this.name) +
-                (!this.angName.equals(this.name) && !this.angName.equals("") ? " ( "+ this.angName +" )" : "");
+    override fun hashCode(): Int {
+        var result = slug.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + angName.hashCode()
+        return result
     }
 }

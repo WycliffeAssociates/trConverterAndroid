@@ -1,55 +1,42 @@
-package bible.translationtools.converter;
+package bible.translationtools.converter
 
-import android.content.Context;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
-import androidx.annotation.Nullable;
+import android.content.Context
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.TextView
 
-import java.util.List;
-
-public class VersionSpinnerAdapter extends ArrayAdapter<Version> {
-    private List<Version> values;
-
-    public VersionSpinnerAdapter(Context context, int textViewResourceId, List<Version> values) {
-        super(context, textViewResourceId, values);
-        this.values = values;
+class VersionSpinnerAdapter(
+    context: Context,
+    textViewResourceId: Int,
+    private val values: MutableList<Version>
+) : ArrayAdapter<Version>(context, textViewResourceId, values) {
+    override fun getCount(): Int {
+        return values.size
     }
 
-    @Override
-    public int getCount(){
-        return values.size();
+    override fun getItem(position: Int): Version? {
+        return values[position]
     }
 
-    @Override
-    public Version getItem(int position){
-        return values.get(position);
+    override fun getPosition(item: Version?): Int {
+        return values.indexOf(item)
     }
 
-    @Override
-    public int getPosition(@Nullable Version item) {
-        return values.indexOf(item);
-    }
-
-    @Override
-    public long getItemId(int position){
-        return position;
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
     }
 
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        TextView label = (TextView) super.getView(position, convertView, parent);
-        label.setText(values.get(position).name);
-        return label;
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        val label = super.getView(position, convertView, parent) as TextView
+        label.text = values[position].name
+        return label
     }
 
-    @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        TextView label = (TextView) super.getDropDownView(position, convertView, parent);
-        label.setText(values.get(position).name);
-
-        return label;
+    override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+        val label = super.getDropDownView(position, convertView, parent) as TextView
+        label.text = values[position].name
+        return label
     }
 }

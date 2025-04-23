@@ -1,46 +1,40 @@
-package bible.translationtools.converter;
+package bible.translationtools.converter
 
-import android.os.AsyncTask;
-import androidx.fragment.app.Fragment;
+import android.os.AsyncTask
+import androidx.fragment.app.Fragment
 
 /**
  * Created by mXaln on 11/11/17.
  */
+class AnalyserTask(c: Fragment?) : AsyncTask<Void?, Int?, Void?>() {
+    var callback: AnalyzerResultCallback
 
-public final class AnalyserTask extends AsyncTask<Void, Integer, Void> {
-
-    AnaliserResultCallback callback;
-
-    public AnalyserTask(Fragment c) {
-        this.callback = (AnaliserResultCallback) c;
+    init {
+        this.callback = c as AnalyzerResultCallback
     }
 
-    @Override
-    protected Void doInBackground(Void... params) {
-        callback.startAnalyze();
-        return null;
+    override fun doInBackground(vararg params: Void?): Void? {
+        callback.startAnalyze()
+        return null
     }
 
-    @Override
-    protected void onPreExecute() {
-        callback.analyzeStarted();
-        super.onPreExecute();
+    override fun onPreExecute() {
+        callback.analyzeStarted()
+        super.onPreExecute()
     }
 
-    @Override
-    protected void onProgressUpdate(Integer... values) {
-        super.onProgressUpdate(values);
+    override fun onProgressUpdate(vararg values: Int?) {
+        super.onProgressUpdate(*values)
     }
 
-    @Override
-    protected void onPostExecute(Void param) {
-        callback.analyzeDone();
-        super.onPostExecute(param);
+    override fun onPostExecute(param: Void?) {
+        callback.analyzeDone()
+        super.onPostExecute(param)
     }
 
-    public interface AnaliserResultCallback {
-        Void startAnalyze();
-        Void analyzeStarted();
-        Void analyzeDone();
+    interface AnalyzerResultCallback {
+        fun startAnalyze()
+        fun analyzeStarted()
+        fun analyzeDone()
     }
 }

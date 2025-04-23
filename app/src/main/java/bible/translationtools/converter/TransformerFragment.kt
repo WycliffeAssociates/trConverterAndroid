@@ -1,261 +1,245 @@
-package bible.translationtools.converter;
+package bible.translationtools.converter
 
-import android.content.Context;
-import android.graphics.Color;
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.*;
-import bible.translationtools.converterlib.ITransformer;
-import bible.translationtools.converterlib.Project;
-import bible.translationtools.converterlib.Transformer;
-import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
+import android.graphics.Color
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import bible.translationtools.converter.TransformerTask.TransformerResultCallback
+import bible.translationtools.converter.databinding.TransformerFragmentBinding
+import bible.translationtools.converter.di.DirectoryProvider
+import bible.translationtools.converterlib.ITransformer
+import bible.translationtools.converterlib.Project
+import bible.translationtools.converterlib.Transformer
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-public class TransformerFragment extends Fragment implements TransformerTask.TransformerResultCallback {
+@AndroidEntryPoint
+class TransformerFragment : Fragment(), TransformerResultCallback {
 
-    private MainActivity activity;
+    @Inject lateinit var directoryProvider: DirectoryProvider
+    @Inject lateinit var langRepo: LanguageRepository
+    @Inject lateinit var versionRepo: VersionRepository
 
-    private String projectName;
-    private String projectsName; // language and version
-    private Language language;
-    private Version version;
-    private String book;
-    private boolean isTransforming = false;
-    private String messageText = "";
-    private String buttonText = "";
+    private lateinit var projectName: String
+    private lateinit var projectsName: String // language and version
+    private lateinit var language: Language
+    private lateinit var version: Version
+    private lateinit var book: String
 
-    private Language newLanguage;
-    private Version newVersion;
+    private var isTransforming = false
+    private var messageText = ""
+    private var buttonText = ""
 
-    private Button button;
-    private ProgressBar progress;
-    private TextView projectTitle;
-    private TextView messageView;
-    private Spinner versionSpinner;
-    private SearchableSpinner languageSpinner;
-    private CheckBox allBooksCheckbox;
+    private var newLanguage: Language? = null
+    private var newVersion: Version? = null
 
-    private LanguageRepository langRepo;
-    private ArrayAdapter<Version> versionsAdapter;
-    private ArrayAdapter<Language> languageAdapter;
+    private lateinit var versionsAdapter: ArrayAdapter<Version>
+    private lateinit var languageAdapter: ArrayAdapter<Language>
 
-    protected ITransformer transformer;
+    private lateinit var transformer: ITransformer
 
-    public static TransformerFragment newInstance(Project project) {
-        Bundle bundle = new Bundle();
-        bundle.putString("projectName", project.toString());
-        bundle.putString("language", project.language);
-        bundle.putString("version", project.version);
-        bundle.putString("book", project.book);
+    private var _binding: TransformerFragmentBinding? = null
+    private val binding get() = _binding!!
 
-        TransformerFragment fragment = new TransformerFragment();
-        fragment.setArguments(bundle);
-        return fragment;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setRetainInstance(true)
     }
 
-    private void readBundle(Bundle bundle) {
-        if (bundle != null) {
-            projectName = bundle.getString("projectName");
-            projectsName = String.format("%s | %s", bundle.getString("language"), bundle.getString("version"));
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        super.onCreateView(inflater, container, savedInstanceState)
 
-            Language lang = langRepo.getLang(bundle.getString("language"));
-            language = new Language(
-                    lang.slug,
-                    lang.name,
-                    lang.angName
-            );
+        _binding = TransformerFragmentBinding.inflate(inflater, container, false)
 
-            Version ver = VersionRepository.getVersion(bundle.getString("version"));
-            version = new Version(
-                    ver.slug,
-                    ver.name
-            );
-            book = bundle.getString("book");
+        langRepo = LanguageRepository(requireContext())
+
+        if (arguments == null) {
+            throw Exception("Arguments not found")
         }
+
+        readBundle(requireArguments())
+
+        return binding.root
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        buttonText = getString(R.string.transform) // Default value
+        binding.languages.setTitle(getString(R.string.select_language))
+
+        init()
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+    override fun startTransformation(): Int {
+        return transformer.execute()
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
+    private fun transform() {
+        newLanguage = binding.languages.selectedItem as Language?
+        newVersion = binding.versions.selectedItem as Version?
 
-        langRepo = new LanguageRepository(getContext());
+        newLanguage = if (newLanguage != language) newLanguage else null
+        newVersion = if (newVersion != version) newVersion else null
 
-        readBundle(getArguments());
+        val newLanguageSlug = newLanguage?.slug
+        val newVersionSlug = newVersion?.slug
 
-        return inflater.inflate(R.layout.transformer_fragment, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        activity = (MainActivity)getActivity();
-
-        button = view.findViewById(R.id.transform);
-        progress = view.findViewById(R.id.progressBar);
-        projectTitle = view.findViewById(R.id.titleView);
-        languageSpinner = view.findViewById(R.id.languages);
-        versionSpinner = view.findViewById(R.id.versions);
-        messageView = view.findViewById(R.id.messageView);
-        allBooksCheckbox = view.findViewById(R.id.allBooksCheckbox);
-
-        buttonText = getString(R.string.transform); // Default value
-        languageSpinner.setTitle(getString(R.string.select_language));
-
-        init();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
-    public Integer startTransformation() {
-        return transformer.execute();
-    }
-
-    protected void transform() {
-        String dir = activity.bttrDir().getAbsolutePath();
-        newLanguage = (Language) languageSpinner.getSelectedItem();
-        newVersion = (Version) versionSpinner.getSelectedItem();
-
-        newLanguage = !newLanguage.equals(language) ? newLanguage : null;
-        newVersion = !newVersion.equals(version) ? newVersion : null;
-
-        String newLanguageSlug = newLanguage != null ? newLanguage.slug : null;
-        String newVersionSlug = newVersion != null ? newVersion.slug : null;
-
-        boolean transformAll = allBooksCheckbox.isChecked();
+        val transformAll = binding.allBooksCheckbox.isChecked
 
         try {
-            transformer = new Transformer(
-                    dir,
-                    language.slug,
-                    version.slug,
-                    (!transformAll ? book : null),
-                    newLanguageSlug,
-                    null,
-                    newVersionSlug
-            );
-            TransformerTask transformerTask = new TransformerTask(TransformerFragment.this);
-            transformerTask.execute();
-        } catch (Exception e) {
-            Toast.makeText(getActivity().getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
+            transformer = Transformer(
+                directoryProvider.workspaceDir.absolutePath,
+                language.slug,
+                version.slug,
+                (if (!transformAll) book else null),
+                newLanguageSlug,
+                null,
+                newVersionSlug
+            )
+            val transformerTask = TransformerTask(this@TransformerFragment)
+            transformerTask.execute()
+        } catch (e: Exception) {
+            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+            e.printStackTrace()
         }
     }
 
-    @Override
-    public Void transformationStarted() {
-        isTransforming = true;
-        messageText = "";
-        buttonText = getString(R.string.processing);
+    override fun transformationStarted() {
+        isTransforming = true
+        messageText = ""
+        buttonText = getString(R.string.processing)
 
-        button.setEnabled(false);
-        button.setText(buttonText);
-        languageSpinner.setVisibility(View.GONE);
-        versionSpinner.setVisibility(View.GONE);
-        allBooksCheckbox.setVisibility(View.GONE);
-        progress.setVisibility(View.VISIBLE);
-        messageView.setText(messageText);
-        return null;
+        binding.transform.isEnabled = false
+        binding.transform.text = buttonText
+        binding.languages.visibility = View.GONE
+        binding.versions.visibility = View.GONE
+        binding.allBooksCheckbox.visibility = View.GONE
+        binding.progressBar.visibility = View.VISIBLE
+        binding.messageView.text = messageText
     }
 
-    @Override
-    public Void transformationDone(final Integer result) {
-        isTransforming = false;
-        buttonText = getString(R.string.transform);
-        transformer.setDateTimeDir();
-        button.setEnabled(true);
-        button.setText(buttonText);
-        progress.setVisibility(View.GONE);
-        languageSpinner.setVisibility(View.VISIBLE);
-        versionSpinner.setVisibility(View.VISIBLE);
+    override fun transformationDone(result: Int?) {
+        isTransforming = false
+        buttonText = getString(R.string.transform)
+        transformer.setDateTimeDir()
+        binding.transform.isEnabled = true
+        binding.transform.text = buttonText
+        binding.progressBar.visibility = View.GONE
+        binding.languages.visibility = View.VISIBLE
+        binding.versions.visibility = View.VISIBLE
 
-        if(result >= 0) {
-            messageText = getString(R.string.transformation_complete, result);
-            messageView.setText(messageText);
+        if (result != null && result >= 0) {
+            messageText = getString(R.string.transformation_complete, result)
+            binding.messageView.text = messageText
 
-            language = newLanguage != null ? newLanguage : language;
-            version = newVersion != null ? newVersion : version;
-            projectName = String.format("%s | %s | %s", language.slug, version.slug, book);
-            projectsName = String.format("%s | %s", language.slug, version.slug);
+            language = newLanguage ?: language
+            version = newVersion ?: version
+            projectName = String.format("%s | %s | %s", language.slug, version.slug, book)
+            projectsName = String.format("%s | %s", language.slug, version.slug)
 
-            projectTitle.setText(projectName);
-            languageSpinner.setSelection(languageAdapter.getPosition(language));
-            versionSpinner.setSelection(versionsAdapter.getPosition(version));
-            allBooksCheckbox.setText(getString(R.string.all_books_check, projectsName));
+            binding.titleView.text = projectName
+            binding.languages.setSelection(languageAdapter.getPosition(language))
+            binding.versions.setSelection(versionsAdapter.getPosition(version))
+            binding.allBooksCheckbox.text = getString(R.string.all_books_check, projectsName)
 
-            getArguments().putString("projectName", projectName);
-            getArguments().putString("language", language.slug);
-            getArguments().putString("version", version.slug);
+            requireArguments().putString("projectName", projectName)
+            requireArguments().putString("language", language.slug)
+            requireArguments().putString("version", version.slug)
         } else {
-            messageText = getString(R.string.error_occurred);
-            messageView.setText(messageText);
+            messageText = getString(R.string.error_occurred)
+            binding.messageView.text = messageText
         }
-        messageView.setTextColor(Color.BLACK);
-        System.out.println("Finished!");
-        return null;
+        binding.messageView.setTextColor(Color.BLACK)
+        println("Finished!")
     }
 
-    protected void init() {
-        versionsAdapter = new VersionSpinnerAdapter(
-                getContext(),
-                android.R.layout.simple_spinner_item,
-                VersionRepository.versionList);
-        versionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        versionSpinner.setAdapter(versionsAdapter);
+    private fun init() {
+        versionsAdapter = VersionSpinnerAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            versionRepo.versionList
+        )
+        versionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.versions.adapter = versionsAdapter
 
-        LanguageRepository languageRepository = new LanguageRepository(getContext());
-        languageAdapter = new LanguageSpinnerAdapter(
-                getContext(),
-                android.R.layout.simple_spinner_item,
-                languageRepository.languageList
-        );
-        languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        languageSpinner.setAdapter(languageAdapter);
+        languageAdapter = LanguageSpinnerAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            langRepo.languageList
+        )
+        languageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.languages.adapter = languageAdapter
 
-        projectTitle.setText(projectName);
-        languageSpinner.setSelection(languageAdapter.getPosition(language));
-        versionSpinner.setSelection(versionsAdapter.getPosition(version));
+        binding.titleView.text = projectName
+        binding.languages.setSelection(languageAdapter.getPosition(language))
+        binding.versions.setSelection(versionsAdapter.getPosition(version))
 
-        if(isTransforming) {
-            button.setEnabled(false);
-            progress.setVisibility(View.VISIBLE);
-            languageSpinner.setVisibility(View.GONE);
-            versionSpinner.setVisibility(View.GONE);
+        if (isTransforming) {
+            binding.transform.isEnabled = false
+            binding.progressBar.visibility = View.VISIBLE
+            binding.languages.visibility = View.GONE
+            binding.versions.visibility = View.GONE
         }
 
-        button.setText(buttonText);
-        messageView.setText(messageText);
+        binding.transform.text = buttonText
+        binding.messageView.text = messageText
 
-        allBooksCheckbox.setText(getString(R.string.all_books_check, projectsName));
+        binding.allBooksCheckbox.text = getString(R.string.all_books_check, projectsName)
 
-        button.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                transform();
-            }
-        });
+        binding.transform.setOnClickListener { transform() }
+    }
+
+    private fun readBundle(bundle: Bundle) {
+        projectName = bundle.getString("projectName") ?: ""
+        projectsName = String.format(
+            "%s | %s",
+            bundle.getString("language"),
+            bundle.getString("version")
+        )
+
+        val lang = langRepo.getLang(bundle.getString("language") ?: "")
+
+        if (lang == null) {
+            throw Exception("Language not found")
+        }
+
+        language = Language(lang.slug, lang.name, lang.angName)
+
+        val ver = versionRepo.getVersion(bundle.getString("version") ?: "")
+
+        if (ver == null) {
+            throw Exception("Version not found")
+        }
+
+        version = Version(ver.slug, ver.name)
+        book = bundle.getString("book") ?: ""
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    companion object {
+        fun newInstance(project: Project): TransformerFragment {
+            val bundle = Bundle()
+            bundle.putString("projectName", project.toString())
+            bundle.putString("language", project.language)
+            bundle.putString("version", project.version)
+            bundle.putString("book", project.book)
+
+            val fragment = TransformerFragment()
+            fragment.setArguments(bundle)
+            return fragment
+        }
     }
 }

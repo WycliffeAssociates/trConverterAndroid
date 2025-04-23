@@ -1,25 +1,24 @@
-package bible.translationtools.converter;
+package bible.translationtools.converter
 
-import java.util.ArrayList;
+import javax.inject.Inject
 
-public class VersionRepository {
+class VersionRepository @Inject constructor() {
+    val versionList: ArrayList<Version> = ArrayList<Version>()
 
-    public static final ArrayList<Version> versionList = new ArrayList<>();
-
-    static {
-        versionList.add(new Version("ulb", "Unlocked Literal Bible"));
-        versionList.add(new Version("udb", "Unlocked Dynamic Bible"));
-        versionList.add(new Version("reg", "Regular"));
-        versionList.add(new Version("v4", "Version 4 (OBS)"));
+    init {
+        versionList.add(Version("ulb", "Unlocked Literal Bible"))
+        versionList.add(Version("udb", "Unlocked Dynamic Bible"))
+        versionList.add(Version("reg", "Regular"))
+        versionList.add(Version("v4", "Version 4 (OBS)"))
     }
 
-    static Version getVersion(String slug) {
-        for (Version v: versionList) {
-            if(v.slug.equals(slug)) {
-                return v;
+    fun getVersion(slug: String): Version? {
+        for (v in versionList) {
+            if (v.slug == slug) {
+                return v
             }
         }
 
-        return null;
+        return null
     }
 }

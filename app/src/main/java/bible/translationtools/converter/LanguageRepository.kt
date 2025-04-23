@@ -1,61 +1,60 @@
-package bible.translationtools.converter;
+package bible.translationtools.converter
 
-import android.content.Context;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.IOException
+import javax.inject.Inject
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
+class LanguageRepository @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
+    val languageList: ArrayList<Language> = ArrayList<Language>()
 
-public class LanguageRepository {
-    private Context context;
-    public final ArrayList<Language> languageList = new ArrayList<>();
-
-    public  LanguageRepository(Context context) {
-        this.context = context;
-        parseJson();
+    init {
+        parseJson()
     }
 
-    Language getLang(String slug) {
-        for (Language l: languageList) {
-            if(l.slug.equals(slug)) {
-                return l;
+    fun getLang(slug: String): Language? {
+        for (l in languageList) {
+            if (l.slug == slug) {
+                return l
             }
         }
-        return null;
+        return null
     }
 
-    String loadJson() {
-        String json;
-        try {
-            InputStream is = context.getAssets().open("langnames.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch(IOException e) {
-            e.printStackTrace();
-            return null;
+    fun loadJson(): String? {
+        return try {
+            context.assets.open("langnames.json").use { input ->
+                val size = input.available()
+                val buffer = ByteArray(size)
+                input.read(buffer)
+                String(buffer, charset("UTF-8"))
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
         }
-        return json;
     }
 
-    void parseJson() {
+    fun parseJson() {
         try {
-            JSONArray jsonArr = new JSONArray(loadJson());
-            for(int i=0; i<jsonArr.length(); i++) {
-                JSONObject obj = (JSONObject) jsonArr.get(i);
-                languageList.add(new Language(
+            val jsonArr = JSONArray(loadJson())
+            for (i in 0..<jsonArr.length()) {
+                val obj = jsonArr.get(i) as JSONObject
+                languageList.add(
+                    Language(
                         obj.getString("lc"),
                         obj.getString("ln"),
                         obj.getString("ang")
-                ));
+                    )
+                )
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (e: JSONException) {
+            e.printStackTrace()
         }
     }
 }

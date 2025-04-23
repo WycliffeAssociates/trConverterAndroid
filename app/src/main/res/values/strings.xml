@@ -29,4 +29,6 @@
     <string name="select_version">Select version</string>
     <string name="select_language">Select language</string>
     <string name="all_books_check">Transform all books under %1$s</string>
+    <string name="open_folder">Open BTTRecorder Directory</string>
+    <string name="open_workspace">Open Workspace</string>
 </resources>

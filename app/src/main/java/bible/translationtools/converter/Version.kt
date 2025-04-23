@@ -1,16 +1,12 @@
-package bible.translationtools.converter;
+package bible.translationtools.converter
 
-public class Version {
-    String slug;
-    String name;
-
-    public Version(String slug, String name) {
-        this.slug = slug;
-        this.name = name;
+data class Version(val slug: String, val name: String) {
+    override fun equals(other: Any?): Boolean {
+        return this.slug == (other as Version).slug
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        return this.slug.equals(((Version) obj).slug);
+    override fun hashCode(): Int {
+        var result = slug.hashCode()
+        result = 31 * result + name.hashCode()
+        return result
     }
 }

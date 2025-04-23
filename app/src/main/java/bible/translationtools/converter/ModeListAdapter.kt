@@ -1,144 +1,113 @@
-package bible.translationtools.converter;
+package bible.translationtools.converter
 
-import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.*;
-import bible.translationtools.converterlib.Project;
+import android.graphics.Color
+import android.graphics.Typeface
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.BaseAdapter
+import bible.translationtools.converter.databinding.ModeListCellBinding
+import bible.translationtools.converterlib.Project
 
-import java.util.List;
-
-public class ModeListAdapter extends BaseAdapter {
-    List<Project> projects;
-    LayoutInflater layoutInflater;
-    FragmentManager fragmentManager;
-
-    public ModeListAdapter(MainActivity activity, List<Project> projects) {
-        this.projects = projects;
-        layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        fragmentManager = activity.getSupportFragmentManager();
+class ModeListAdapter : BaseAdapter() {
+    interface OnEditProjectListener {
+        fun onEdit(project: Project)
     }
 
-    @Override
-    public int getCount() {
-        return projects.size();
+    private var listener: OnEditProjectListener? = null
+    private val projects = mutableListOf<Project>()
+
+    fun setProjects(projects: MutableList<Project>) {
+        this.projects.clear()
+        this.projects.addAll(projects)
+        notifyDataSetChanged()
     }
 
-    @Override
-    public Object getItem(int position) {
-        return projects.get(position);
+    fun setListener(listener: OnEditProjectListener) {
+        this.listener = listener
     }
 
-    @Override
-    public long getItemId(int position) {
-        return position;
+    override fun getCount(): Int {
+        return projects.size
     }
 
-    @Override
-    public int getViewTypeCount() {
-        return projects.size();
+    override fun getItem(position: Int): Project? {
+        return projects[position]
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return position;
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
     }
 
-    @Override
-    public boolean isEnabled(int position) {
-        return super.isEnabled(position);
+    override fun getViewTypeCount(): Int {
+        return projects.size
     }
 
-    private static class ViewHolder {
-        TextView projectText;
-        RadioGroup radioGroup;
-        RadioButton verseButton;
-        RadioButton chunkButton;
-        Button editButton;
-
-        Boolean isEmpty = null;
+    override fun getItemViewType(position: Int): Int {
+        return position
     }
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final ViewHolder viewHolder;
-        final Project item = projects.get(position);
-        Boolean isEmpty = item.mode.isEmpty();
+    override fun isEnabled(position: Int): Boolean {
+        return super.isEnabled(position)
+    }
+
+    private inner class ViewHolder(val binding: ModeListCellBinding) {
+        private var isEmpty: Boolean? = null
+
+        fun bind(position: Int) {
+            val item = projects[position]
+            isEmpty = item.mode.isEmpty()
+
+            binding.projectTextView.text = item.toString()
+            if (isEmpty == false) {
+                binding.projectTextView.setTextColor(if (item.shouldUpdate) Color.RED else Color.GRAY)
+                binding.editProject.setOnClickListener {
+                    listener?.onEdit(item)
+                }
+            } else {
+                binding.projectTextView.setTextColor(if (isEmpty == true) Color.RED else Color.BLACK)
+                binding.projectTextView.setTypeface(null, Typeface.BOLD)
+                binding.verseRadio.setTextColor(if (isEmpty == true) Color.RED else Color.BLACK)
+                binding.verseRadio.setTypeface(null, Typeface.BOLD)
+                binding.chunkRadio.setTextColor(if (isEmpty == true) Color.RED else Color.BLACK)
+                binding.chunkRadio.setTypeface(null, Typeface.BOLD)
+                binding.editProject.setEnabled(false)
+            }
+
+            binding.verseRadio.setChecked(item.mode == "verse")
+            binding.verseRadio.setOnClickListener {
+                item.mode = "verse"
+                item.shouldUpdate = true
+                binding.projectTextView.setTextColor(Color.BLACK)
+                binding.verseRadio.setTextColor(Color.BLACK)
+                binding.chunkRadio.setTextColor(Color.BLACK)
+            }
+
+            binding.chunkRadio.setChecked(item.mode == "chunk")
+            binding.chunkRadio.setOnClickListener {
+                item.mode = "chunk"
+                item.shouldUpdate = true
+                binding.projectTextView.setTextColor(Color.BLACK)
+                binding.verseRadio.setTextColor(Color.BLACK)
+                binding.chunkRadio.setTextColor(Color.BLACK)
+            }
+        }
+    }
+
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        val binding: ModeListCellBinding
+        val viewHolder: ViewHolder
 
         if (convertView == null) {
-            viewHolder = new ViewHolder();
-            convertView = layoutInflater.inflate(R.layout.mode_list_cell, null);
-            viewHolder.projectText = convertView.findViewById(R.id.projectTextView);
-            viewHolder.radioGroup = convertView.findViewById(R.id.radioGroup);
-            viewHolder.verseButton = convertView.findViewById(R.id.verseRadio);
-            viewHolder.chunkButton = convertView.findViewById(R.id.chunkRadio);
-            viewHolder.editButton = convertView.findViewById(R.id.editProject);
-
-            convertView.setTag(viewHolder);
+            binding = ModeListCellBinding.inflate(LayoutInflater.from(parent.context))
+            viewHolder = ViewHolder(binding)
+            binding.root.tag = viewHolder
         } else {
-            viewHolder = (ViewHolder) convertView.getTag();
+            viewHolder = convertView.tag as ViewHolder
         }
 
-        if (viewHolder.isEmpty == null) {
-            viewHolder.isEmpty = isEmpty;
-        }
+        viewHolder.bind(position)
 
-        viewHolder.projectText.setText(item.toString());
-        if (!viewHolder.isEmpty) {
-            viewHolder.projectText.setTextColor(item.pending ? Color.RED : Color.GRAY);
-
-            viewHolder.editButton.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View v) {
-                    FragmentTransaction ft = fragmentManager.beginTransaction();
-                    ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-                    ft.replace(
-                            R.id.fragment_container,
-                            TransformerFragment.newInstance(item)
-                    );
-                    ft.addToBackStack(null);
-                    ft.commit();
-                }
-
-            });
-        } else {
-            viewHolder.projectText.setTextColor(isEmpty ? Color.RED : Color.BLACK);
-            viewHolder.projectText.setTypeface(null, Typeface.BOLD);
-            viewHolder.verseButton.setTextColor(isEmpty ? Color.RED : Color.BLACK);
-            viewHolder.verseButton.setTypeface(null, Typeface.BOLD);
-            viewHolder.chunkButton.setTextColor(isEmpty ? Color.RED : Color.BLACK);
-            viewHolder.chunkButton.setTypeface(null, Typeface.BOLD);
-            viewHolder.editButton.setEnabled(false);
-        }
-
-        viewHolder.verseButton.setChecked(item.mode.equals("verse"));
-        viewHolder.verseButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                item.mode = "verse";
-                item.pending = true;
-                viewHolder.projectText.setTextColor(Color.BLACK);
-                viewHolder.verseButton.setTextColor(Color.BLACK);
-                viewHolder.chunkButton.setTextColor(Color.BLACK);
-            }
-
-        });
-
-        viewHolder.chunkButton.setChecked(item.mode.equals("chunk"));
-        viewHolder.chunkButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                item.mode = "chunk";
-                item.pending = true;
-                viewHolder.projectText.setTextColor(Color.BLACK);
-                viewHolder.verseButton.setTextColor(Color.BLACK);
-                viewHolder.chunkButton.setTextColor(Color.BLACK);
-            }
-
-        });
-
-        return convertView;
+        return viewHolder.binding.root
     }
 }

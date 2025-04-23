@@ -1,321 +1,227 @@
-package bible.translationtools.converter;
+package bible.translationtools.converter
 
-import android.content.Context;
-import android.graphics.Color;
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.*;
-import bible.translationtools.converterlib.Converter;
-import bible.translationtools.converterlib.IConverter;
-import bible.translationtools.converterlib.Project;
+import android.content.Context
+import android.graphics.Color
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
+import bible.translationtools.converter.AnalyserTask.AnalyzerResultCallback
+import bible.translationtools.converter.ConverterTask.ConverterResultCallback
+import bible.translationtools.converter.databinding.ConverterFragmentBinding
+import bible.translationtools.converter.di.DirectoryProvider
+import bible.translationtools.converterlib.Converter
+import bible.translationtools.converterlib.IConverter
+import bible.translationtools.converterlib.Project
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-import java.util.ArrayList;
-import java.util.List;
+@AndroidEntryPoint
+class ConverterFragment : Fragment(), ConverterResultCallback, AnalyzerResultCallback,
+    ModeListAdapter.OnEditProjectListener {
 
-public class ConverterFragment extends Fragment implements ConverterTask.ConverterResultCallback,
-        AnalyserTask.AnaliserResultCallback, MigrationTask.MigrationResultCallback,
-        MigrationDialogFragment.MigrationCallback {
+    @Inject lateinit var directoryProvider: DirectoryProvider
 
-    private MainActivity activity;
+    private var isAnalyzing = false
+    private var isConverting = false
+    private var isMigrating = false
+    private var messageText = ""
+    private var buttonText = ""
 
-    private boolean isAnalyzing = false;
-    private boolean isConverting = false;
-    private boolean isMigrating = false;
-    private String messageText = "";
-    private String buttonText = "";
+    private val listAdapter = ModeListAdapter()
+    private lateinit var converter: IConverter
 
-    private Button button;
-    private ProgressBar progress;
-    private TextView messageView;
-    private ImageView migrateButton;
+    private var projects: MutableList<Project> = ArrayList<Project>()
 
-    private ListView listView;
-    private ModeListAdapter listAdapter;
+    private var _binding: ConverterFragmentBinding? = null
+    private val binding get() = _binding!!
 
-    private List<Project> projects = new ArrayList<>();
-    protected IConverter converter;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setRetainInstance(true)
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
-        return inflater.inflate(R.layout.converter_fragment, container, false);
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        super.onCreateView(inflater, container, savedInstanceState)
+        _binding = ConverterFragmentBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        activity = (MainActivity)getActivity();
-
-        button = view.findViewById(R.id.convert);
-        progress = view.findViewById(R.id.progressBar);
-        listView = view.findViewById(R.id.listView);
-        messageView = view.findViewById(R.id.messageView);
-        migrateButton = view.findViewById(R.id.migrate);
-
-        buttonText = getString(R.string.analyze); // Default value
-
-        init();
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        buttonText = getString(R.string.analyze) // Default value
+        init()
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    protected void init() {
-        if(!projects.isEmpty()) {
-            buttonText = getString(R.string.convert);
-            listAdapter = new ModeListAdapter(activity, projects);
-            listView.setAdapter(listAdapter);
+    private fun init() {
+        if (!projects.isEmpty()) {
+            buttonText = getString(R.string.convert)
+            listAdapter.setListener(this)
+            listAdapter.setProjects(projects)
+            binding.listView.adapter = listAdapter
         }
 
-        if(isAnalyzing || isConverting || isMigrating) {
-            button.setEnabled(false);
-            progress.setVisibility(View.VISIBLE);
-            listView.setVisibility(View.GONE);
+        if (isAnalyzing || isConverting || isMigrating) {
+            binding.convert.isEnabled = false
+            binding.progressBar.visibility = View.VISIBLE
+            binding.listView.visibility = View.GONE
         }
 
-        button.setText(buttonText);
-        messageView.setText(messageText);
-
-        String dir = activity.bttrDir().getAbsolutePath();
-        if(activity.trDir().exists()) {
-            migrateButton.setVisibility(View.VISIBLE);
-            migrateButton.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View v) {
-                    showMigrationDialog();
-                }
-            });
-            showMigrationDialog();
-        } else {
-            migrateButton.setVisibility(View.GONE);
-        }
+        binding.convert.text = buttonText
+        binding.messageView.text = messageText
 
         try {
-            converter = new Converter(dir);
-            button.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View v) {
-                    if (projects.isEmpty())
-                        analyze();
-                    else
-                        convert();
-                }
-            });
-        } catch (Exception e) {
-            Toast.makeText(getActivity().getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
+            converter = Converter(directoryProvider.workspaceDir.absolutePath)
+            binding.convert.setOnClickListener {
+                if (projects.isEmpty()) analyze() else convert()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+            e.printStackTrace()
         }
     }
 
-    protected void analyze() {
-        AnalyserTask analyserTask = new AnalyserTask(ConverterFragment.this);
-        analyserTask.execute();
+    private fun analyze() {
+        val analyserTask = AnalyserTask(this@ConverterFragment)
+        analyserTask.execute()
     }
 
-    @Override
-    public Void startAnalyze() {
-        converter.analyze();
-        return null;
+    override fun startAnalyze() {
+        converter.analyze()
     }
 
-    @Override
-    public Void analyzeStarted() {
-        isAnalyzing = true;
-        messageText = "";
-        buttonText = getString(R.string.analyzing);
+    override fun analyzeStarted() {
+        isAnalyzing = true
+        messageText = ""
+        buttonText = getString(R.string.analyzing)
 
-        button.setEnabled(false);
-        button.setText(buttonText);
-        progress.setVisibility(View.VISIBLE);
-        messageView.setText(messageText);
-        migrateButton.setVisibility(View.GONE);
-        return null;
+        binding.convert.isEnabled = false
+        binding.convert.text = buttonText
+        binding.progressBar.visibility = View.VISIBLE
+        binding.messageView.text = messageText
     }
 
-    @Override
-    public Void analyzeDone() {
-        isAnalyzing = false;
-        buttonText = getString(R.string.convert);
+    override fun analyzeDone() {
+        isAnalyzing = false
+        buttonText = getString(R.string.convert)
 
-        projects = converter.getProjects();
-        button.setEnabled(true);
-        button.setText(buttonText);
-        listView.setVisibility(View.VISIBLE);
-        progress.setVisibility(View.GONE);
+        projects = converter.projects
+        binding.convert.isEnabled = true
+        binding.convert.text = buttonText
+        binding.listView.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
 
-        if(activity.trDir().exists()) {
-            migrateButton.setVisibility(View.VISIBLE);
-        }
-
-        if(projects.isEmpty()) {
-            Toast.makeText(getActivity().getApplicationContext(), R.string.empty_modes, Toast.LENGTH_SHORT).show();
-            button.setText(R.string.analyze);
+        if (projects.isEmpty()) {
+            Toast.makeText(context, R.string.empty_modes, Toast.LENGTH_SHORT).show()
+            binding.convert.setText(R.string.analyze)
         } else {
-            Boolean hasEmptyModes = false;
-            for (Project m: projects) {
-                if (m.mode.isEmpty())
-                {
-                    hasEmptyModes = true;
-                    break;
+            var hasEmptyModes = false
+            for (m in projects) {
+                if (m.mode.isEmpty()) {
+                    hasEmptyModes = true
+                    break
                 }
             }
 
-            if(hasEmptyModes) {
-                messageView.setText(R.string.set_modes);
-                messageView.setTextColor(Color.RED);
+            if (hasEmptyModes) {
+                binding.messageView.setText(R.string.set_modes)
+                binding.messageView.setTextColor(Color.RED)
             }
-            listAdapter = new ModeListAdapter(activity, projects);
-            listView.setAdapter(listAdapter);
+
+            listAdapter.setListener(this)
+            listAdapter.setProjects(projects)
+            binding.listView.setAdapter(listAdapter)
         }
-        return null;
     }
 
-    protected void convert() {
-        Boolean hasEmptyModes = false;
-        for (Project m: projects) {
-            if (m.mode.isEmpty())
-            {
-                hasEmptyModes = true;
-                break;
+    private fun convert() {
+        var hasEmptyModes = false
+        for (m in projects) {
+            if (m.mode.isEmpty()) {
+                hasEmptyModes = true
+                break
             }
         }
 
         if (!hasEmptyModes) {
-            converter.setProjects(projects);
-            ConverterTask converterTask = new ConverterTask(ConverterFragment.this);
-            converterTask.execute();
+            converter.projects = projects
+            val converterTask = ConverterTask(this@ConverterFragment)
+            converterTask.execute()
         } else {
-            Toast.makeText(getActivity().getApplicationContext(), R.string.set_modes, Toast.LENGTH_LONG).show();
+            Toast.makeText(
+                context,
+                R.string.set_modes,
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
-    @Override
-    public Integer startConversion() {
-        return converter.execute();
+    override fun startConversion(): Int {
+        return converter.execute()
     }
 
-    @Override
-    public Void conversionStarted() {
-        isConverting = true;
-        messageText = "";
-        buttonText = getString(R.string.processing);
+    override fun conversionStarted() {
+        isConverting = true
+        messageText = ""
+        buttonText = getString(R.string.processing)
 
-        button.setEnabled(false);
-        button.setText(buttonText);
-        listView.setVisibility(View.GONE);
-        progress.setVisibility(View.VISIBLE);
-        messageView.setText(messageText);
-        migrateButton.setVisibility(View.GONE);
-        return null;
+        binding.convert.isEnabled = false
+        binding.convert.text = buttonText
+        binding.listView.visibility = View.GONE
+        binding.progressBar.visibility = View.VISIBLE
+        binding.messageView.text = messageText
     }
 
-    @Override
-    public Void conversionDone(final Integer result) {
-        isConverting = false;
-        buttonText = getString(R.string.analyze);
-        projects.clear();
-        converter.setProjects(projects);
-        converter.setDateTimeDir();
-        button.setEnabled(true);
-        button.setText(buttonText);
-        progress.setVisibility(View.GONE);
+    override fun conversionDone(result: Int?) {
+        isConverting = false
+        buttonText = getString(R.string.analyze)
+        projects.clear()
+        converter.projects = projects
+        converter.setDateTimeDir()
+        binding.convert.isEnabled = true
+        binding.convert.text = buttonText
+        binding.progressBar.visibility = View.GONE
 
-        if(activity.trDir().exists()) {
-            migrateButton.setVisibility(View.VISIBLE);
-        }
-
-        if(result >= 0) {
-            messageText = getString(R.string.conversion_complete, result);
-            messageView.setText(messageText);
+        if (result != null && result >= 0) {
+            messageText = getString(R.string.conversion_complete, result)
+            binding.messageView.text = messageText
         } else {
-            messageText = getString(R.string.error_occurred);
-            messageView.setText(messageText);
+            messageText = getString(R.string.error_occurred)
+            binding.messageView.text = messageText
         }
-        messageView.setTextColor(Color.BLACK);
-        System.out.println("Finished!");
-        return null;
+        binding.messageView.setTextColor(Color.BLACK)
+        println("Finished!")
     }
 
-    @Override
-    public void onMigrate() {
-        MigrationTask migrationTask = new MigrationTask(ConverterFragment.this);
-        migrationTask.execute();
+    override fun onResume() {
+        super.onResume()
+        analyze()
     }
 
-    @Override
-    public Void startMigration() {
-        System.out.println("Migration started.....");
-        if(activity.bttrDir().exists()) {
-            messageText = getString(R.string.migration_error);
-            messageView.setText(messageText);
-            return null;
-        }
-
-        if(activity.trDir().renameTo(activity.bttrDir())) {
-            messageText = getString(R.string.migration_success);
-            messageView.setTextColor(getResources().getColor(R.color.colorAccent));
-        }
-
-        return null;
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
-    @Override
-    public Void migrationStarted() {
-        isMigrating = true;
-        messageText = "";
-        buttonText = getString(R.string.migrating);
-
-        button.setEnabled(false);
-        button.setText(buttonText);
-        progress.setVisibility(View.VISIBLE);
-        messageView.setText(messageText);
-        migrateButton.setVisibility(View.GONE);
-        return null;
-    }
-
-    @Override
-    public Void migrationDone() {
-        isMigrating = false;
-        button.setEnabled(true);
-        buttonText = getString(R.string.analyze);
-        progress.setVisibility(View.GONE);
-        init();
-        return null;
-    }
-
-    private void showMigrationDialog() {
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        MigrationDialogFragment dialog = new MigrationDialogFragment();
-        dialog.setMigrationCallback(this);
-        dialog.show(fm, "migrate");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        analyze();
+    override fun onEdit(project: Project) {
+        val ft: FragmentTransaction = parentFragmentManager.beginTransaction()
+        ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+        ft.replace(
+            R.id.fragment_container,
+            TransformerFragment.newInstance(project)
+        )
+        ft.addToBackStack(null)
+        ft.commit()
     }
 }

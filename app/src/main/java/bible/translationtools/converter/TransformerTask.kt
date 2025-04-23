@@ -1,45 +1,39 @@
-package bible.translationtools.converter;
+package bible.translationtools.converter
 
-import android.os.AsyncTask;
-import androidx.fragment.app.Fragment;
+import android.os.AsyncTask
+import androidx.fragment.app.Fragment
 
 /**
  * Created by mXaln on 11/11/17.
  */
+class TransformerTask(c: Fragment?) : AsyncTask<Void?, Int?, Int?>() {
+    var callback: TransformerResultCallback
 
-public final class TransformerTask extends AsyncTask<Void, Integer, Integer> {
-
-    TransformerResultCallback callback;
-
-    public TransformerTask(Fragment c) {
-        this.callback = (TransformerResultCallback) c;
+    init {
+        this.callback = c as TransformerResultCallback
     }
 
-    @Override
-    protected Integer doInBackground(Void... params) {
-        return callback.startTransformation();
+    override fun doInBackground(vararg params: Void?): Int? {
+        return callback.startTransformation()
     }
 
-    @Override
-    protected void onPreExecute() {
-        callback.transformationStarted();
-        super.onPreExecute();
+    override fun onPreExecute() {
+        callback.transformationStarted()
+        super.onPreExecute()
     }
 
-    @Override
-    protected void onProgressUpdate(Integer... values) {
-        super.onProgressUpdate(values);
+    override fun onProgressUpdate(vararg values: Int?) {
+        super.onProgressUpdate(*values)
     }
 
-    @Override
-    protected void onPostExecute(Integer result) {
-        callback.transformationDone(result);
-        super.onPostExecute(result);
+    override fun onPostExecute(result: Int?) {
+        callback.transformationDone(result)
+        super.onPostExecute(result)
     }
 
-    public interface TransformerResultCallback {
-        Integer startTransformation();
-        Void transformationStarted();
-        Void transformationDone(Integer result);
+    interface TransformerResultCallback {
+        fun startTransformation(): Int
+        fun transformationStarted()
+        fun transformationDone(result: Int?)
     }
 }
