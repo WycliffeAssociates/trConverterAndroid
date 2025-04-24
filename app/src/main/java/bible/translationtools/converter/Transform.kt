@@ -7,7 +7,7 @@ class Transform @Inject constructor() {
 
     data class Result(val count: Int, val error: String?)
 
-    fun execute(transformer: ITransformer): Result {
+    operator fun invoke(transformer: ITransformer): Result {
         return try {
             val result = transformer.execute()
             Result(result, null)

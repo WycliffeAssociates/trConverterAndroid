@@ -56,11 +56,12 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:2.2.1"
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation "androidx.appcompat:appcompat:1.7.0"
-    implementation("com.github.Bible-Translation-Tools:BTTConverter:0.7.1") {
-        exclude group: "commons-io", module: "commons-io"
+    implementation("org.bibletranslationtools:bttr-converter:0.7.2") {
         exclude group: "org.json", module: "json"
-        exclude group: "info.picocli", module: "picocli"
+        // exclude group: "commons-io", module: "commons-io"
+        // exclude group: "info.picocli", module: "picocli"
     }
+    implementation 'net.lingala.zip4j:zip4j:2.11.5'
     implementation "com.github.miteshpithadiya:SearchableSpinner:master"
     androidTestImplementation "androidx.test.espresso:espresso-core:3.6.1"
     androidTestImplementation "androidx.test:runner:1.6.2"

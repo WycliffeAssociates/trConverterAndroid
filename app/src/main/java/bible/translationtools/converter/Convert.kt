@@ -6,7 +6,7 @@ import javax.inject.Inject
 class Convert @Inject constructor() {
     data class Result(val count: Int, val error: String?)
 
-    fun execute(converter: IConverter): Result {
+    operator fun invoke(converter: IConverter): Result {
         return try {
             val result = converter.execute()
             Result(result, null)

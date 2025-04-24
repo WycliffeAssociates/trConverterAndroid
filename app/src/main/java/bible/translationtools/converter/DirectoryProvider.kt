@@ -1,7 +1,6 @@
-package bible.translationtools.converter.di
+package bible.translationtools.converter
 
 import android.content.Context
-import bible.translationtools.converter.FileUtils
 import java.io.File
 
 interface DirectoryProvider {
@@ -68,7 +67,13 @@ class DirectoryProviderImpl (private val context: Context) : DirectoryProvider {
         get() = context.cacheDir
 
     override val workspaceDir: File
-        get() = File(externalAppDir, "workspace")
+        get() {
+            val workspace = File(externalAppDir, "workspace")
+            if (!workspace.exists()) {
+                workspace.mkdirs()
+            }
+            return workspace
+        }
 
     override fun createTempDir(name: String?): File {
         val tempName = name ?: System.currentTimeMillis().toString()

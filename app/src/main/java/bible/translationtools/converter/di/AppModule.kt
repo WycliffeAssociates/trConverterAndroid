@@ -1,6 +1,8 @@
 package bible.translationtools.converter.di
 
 import android.content.Context
+import bible.translationtools.converter.DirectoryProvider
+import bible.translationtools.converter.DirectoryProviderImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

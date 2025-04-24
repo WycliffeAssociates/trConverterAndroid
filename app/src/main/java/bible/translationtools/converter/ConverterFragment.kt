@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import bible.translationtools.converter.databinding.ConverterFragmentBinding
-import bible.translationtools.converter.di.DirectoryProvider
 import bible.translationtools.converterlib.Converter
 import bible.translationtools.converterlib.IConverter
 import bible.translationtools.converterlib.Project
@@ -84,7 +83,7 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
         binding.messageView.text = messageText
 
         try {
-            converter = Converter(directoryProvider.workspaceDir.absolutePath)
+            converter = Converter(directoryProvider.workspaceDir.absolutePath, false)
             binding.convert.setOnClickListener {
                 if (projects.isEmpty()) analyze() else convert()
             }
@@ -105,7 +104,7 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
         analyzeStarted()
         val handler = Handler(Looper.getMainLooper())
         uiScope.launch(Dispatchers.IO) {
-            val result = analyze.execute(converter)
+            val result = analyze(converter)
             if (!result.success) {
                 result.error?.let(::showErrorDialog)
             }
@@ -173,7 +172,7 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
             conversionStarted()
 
             uiScope.launch(Dispatchers.IO) {
-                val result = convert.execute(converter)
+                val result = convert(converter)
                 handler.post { conversionDone(result.count) }
             }
         } else {

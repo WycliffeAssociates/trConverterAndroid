@@ -6,7 +6,7 @@ import javax.inject.Inject
 class Analyze @Inject constructor() {
     data class Result(val success: Boolean, val error: String?)
 
-    fun execute(converter: IConverter): Result {
+    operator fun invoke(converter: IConverter): Result {
         return try {
             converter.analyze()
             Result(true, null)

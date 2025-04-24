@@ -11,7 +11,6 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import bible.translationtools.converter.databinding.TransformerFragmentBinding
-import bible.translationtools.converter.di.DirectoryProvider
 import bible.translationtools.converterlib.ITransformer
 import bible.translationtools.converterlib.Project
 import bible.translationtools.converterlib.Transformer
@@ -98,12 +97,13 @@ class TransformerFragment : Fragment() {
                 (if (!transformAll) book else null),
                 newLanguageSlug,
                 null,
-                newVersionSlug
+                newVersionSlug,
+                false
             )
 
             val handler = Handler(Looper.getMainLooper())
             uiScope.launch(Dispatchers.IO) {
-                val result = transform.execute(transformer!!)
+                val result = transform(transformer!!)
                 handler.post { transformationDone(result.count) }
             }
         } catch (e: Exception) {

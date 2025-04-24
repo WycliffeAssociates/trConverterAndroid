@@ -3,33 +3,44 @@ package bible.translationtools.converter
 import android.app.AlertDialog
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
 import androidx.fragment.app.Fragment
 import bible.translationtools.converter.databinding.HomeFragmentBinding
-import bible.translationtools.converter.di.DirectoryProvider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     @Inject lateinit var directoryProvider: DirectoryProvider
+    @Inject lateinit var extractBackup: ExtractBackup
 
     private var openDirectory: ActivityResultLauncher<Uri?>? = null
+    private var openBackup: ActivityResultLauncher<String?>? = null
 
     private var _binding: HomeFragmentBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var backPressedCallback: OnBackPressedCallback
+    private val uiScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         openDirectory = registerForActivityResult(OpenDocumentTree()) { uri: Uri? ->
-            uri?.let(::loadWorkspace)
+            uri?.let(::importDirectory)
+        }
+        openBackup = registerForActivityResult(GetContent()) { uri: Uri? ->
+            uri?.let(::importBackup)
         }
     }
 
@@ -61,6 +72,10 @@ class HomeFragment : Fragment() {
             openDirectory?.launch(null)
         }
 
+        binding.openBackup.setOnClickListener {
+            openBackup?.launch("application/zip")
+        }
+
         binding.openWorkspace.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, ConverterFragment())
@@ -79,18 +94,43 @@ class HomeFragment : Fragment() {
         backPressedCallback.remove()
     }
 
-    private fun loadWorkspace(uri: Uri) {
-        try {
-            FileUtils.deleteRecursive(directoryProvider.workspaceDir)
-            FileUtils.copyDirectory(requireContext(), uri, directoryProvider.workspaceDir)
+    private fun importDirectory(uri: Uri) {
+        val handler = Handler(Looper.getMainLooper())
+        uiScope.launch(Dispatchers.IO) {
+            try {
+                FileUtils.deleteRecursive(directoryProvider.workspaceDir)
+                FileUtils.copyDirectory(requireContext(), uri, directoryProvider.workspaceDir)
 
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ConverterFragment())
-                .addToBackStack(null)
-                .commit()
-        } catch (e: Exception) {
-            e.printStackTrace()
+                handler.post { loadWorkspace() }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
+    }
+
+    private fun importBackup(uri: Uri) {
+        val handler = Handler(Looper.getMainLooper())
+        uiScope.launch(Dispatchers.IO) {
+            try {
+                FileUtils.deleteRecursive(directoryProvider.workspaceDir)
+
+                val result = extractBackup(uri)
+                if (result.success) {
+                    handler.post { loadWorkspace() }
+                } else {
+                    println(result.message)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun loadWorkspace() {
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, ConverterFragment())
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun showExitConfirmationDialog() {
