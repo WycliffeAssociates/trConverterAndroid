@@ -1,10 +1,12 @@
 package bible.translationtools.converter
 
+import android.app.AlertDialog
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
 import androidx.fragment.app.Fragment
@@ -22,10 +24,10 @@ class HomeFragment : Fragment() {
     private var _binding: HomeFragmentBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var backPressedCallback: OnBackPressedCallback
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setRetainInstance(true)
-
         openDirectory = registerForActivityResult(OpenDocumentTree()) { uri: Uri? ->
             uri?.let(::loadWorkspace)
         }
@@ -44,17 +46,26 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        backPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                showExitConfirmationDialog()
+            }
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            backPressedCallback
+        )
+
         binding.openFolder.setOnClickListener {
             openDirectory?.launch(null)
         }
 
         binding.openWorkspace.setOnClickListener {
-            val fm = parentFragmentManager
-            val ft = fm.beginTransaction()
-            val fragment: Fragment = ConverterFragment()
-            ft.replace(R.id.fragment_container, fragment)
-            ft.addToBackStack(null)
-            ft.commit()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, ConverterFragment())
+                .addToBackStack(null)
+                .commit()
         }
     }
 
@@ -65,6 +76,7 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        backPressedCallback.remove()
     }
 
     private fun loadWorkspace(uri: Uri) {
@@ -72,14 +84,24 @@ class HomeFragment : Fragment() {
             FileUtils.deleteRecursive(directoryProvider.workspaceDir)
             FileUtils.copyDirectory(requireContext(), uri, directoryProvider.workspaceDir)
 
-            val fm = parentFragmentManager
-            val ft = fm.beginTransaction()
-            val fragment: Fragment = ConverterFragment()
-            ft.replace(R.id.fragment_container, fragment)
-            ft.addToBackStack(null)
-            ft.commit()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, ConverterFragment())
+                .addToBackStack(null)
+                .commit()
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun showExitConfirmationDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.exit_app)
+            .setMessage(R.string.exit_confirm)
+            .setPositiveButton(R.string.yes) { _, _ ->
+                backPressedCallback.isEnabled = false
+                requireActivity().finishAffinity()
+            }
+            .setNegativeButton(R.string.no, null)
+            .show()
     }
 }

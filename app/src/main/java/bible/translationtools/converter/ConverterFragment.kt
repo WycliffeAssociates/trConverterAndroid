@@ -3,27 +3,31 @@ package bible.translationtools.converter
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
-import bible.translationtools.converter.AnalyserTask.AnalyzerResultCallback
-import bible.translationtools.converter.ConverterTask.ConverterResultCallback
 import bible.translationtools.converter.databinding.ConverterFragmentBinding
 import bible.translationtools.converter.di.DirectoryProvider
 import bible.translationtools.converterlib.Converter
 import bible.translationtools.converterlib.IConverter
 import bible.translationtools.converterlib.Project
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ConverterFragment : Fragment(), ConverterResultCallback, AnalyzerResultCallback,
-    ModeListAdapter.OnEditProjectListener {
+class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
 
     @Inject lateinit var directoryProvider: DirectoryProvider
+    @Inject lateinit var analyze: Analyze
+    @Inject lateinit var convert: Convert
 
     private var isAnalyzing = false
     private var isConverting = false
@@ -39,13 +43,10 @@ class ConverterFragment : Fragment(), ConverterResultCallback, AnalyzerResultCal
     private var _binding: ConverterFragmentBinding? = null
     private val binding get() = _binding!!
 
+    private val uiScope = CoroutineScope(Dispatchers.Main)
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setRetainInstance(true)
     }
 
     override fun onCreateView(
@@ -60,11 +61,12 @@ class ConverterFragment : Fragment(), ConverterResultCallback, AnalyzerResultCal
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        buttonText = getString(R.string.analyze) // Default value
         init()
     }
 
     private fun init() {
+        buttonText = getString(R.string.analyze) // Default value
+
         if (!projects.isEmpty()) {
             buttonText = getString(R.string.convert)
             listAdapter.setListener(this)
@@ -90,18 +92,28 @@ class ConverterFragment : Fragment(), ConverterResultCallback, AnalyzerResultCal
             Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
             e.printStackTrace()
         }
+
+        parentFragmentManager.setFragmentResultListener(
+            TransformerFragment.TRANSFORMER_ID,
+            viewLifecycleOwner
+        ) { requestKey, bundle ->
+            bundle.getString(TransformerFragment.TRANSFORMER_ERROR_KEY)?.let(::showErrorDialog)
+        }
     }
 
     private fun analyze() {
-        val analyserTask = AnalyserTask(this@ConverterFragment)
-        analyserTask.execute()
+        analyzeStarted()
+        val handler = Handler(Looper.getMainLooper())
+        uiScope.launch(Dispatchers.IO) {
+            val result = analyze.execute(converter)
+            if (!result.success) {
+                result.error?.let(::showErrorDialog)
+            }
+            handler.post { analyzeDone() }
+        }
     }
 
-    override fun startAnalyze() {
-        converter.analyze()
-    }
-
-    override fun analyzeStarted() {
+    private fun analyzeStarted() {
         isAnalyzing = true
         messageText = ""
         buttonText = getString(R.string.analyzing)
@@ -112,7 +124,7 @@ class ConverterFragment : Fragment(), ConverterResultCallback, AnalyzerResultCal
         binding.messageView.text = messageText
     }
 
-    override fun analyzeDone() {
+    private fun analyzeDone() {
         isAnalyzing = false
         buttonText = getString(R.string.convert)
 
@@ -156,8 +168,14 @@ class ConverterFragment : Fragment(), ConverterResultCallback, AnalyzerResultCal
 
         if (!hasEmptyModes) {
             converter.projects = projects
-            val converterTask = ConverterTask(this@ConverterFragment)
-            converterTask.execute()
+
+            val handler = Handler(Looper.getMainLooper())
+            conversionStarted()
+
+            uiScope.launch(Dispatchers.IO) {
+                val result = convert.execute(converter)
+                handler.post { conversionDone(result.count) }
+            }
         } else {
             Toast.makeText(
                 context,
@@ -167,11 +185,7 @@ class ConverterFragment : Fragment(), ConverterResultCallback, AnalyzerResultCal
         }
     }
 
-    override fun startConversion(): Int {
-        return converter.execute()
-    }
-
-    override fun conversionStarted() {
+    private fun conversionStarted() {
         isConverting = true
         messageText = ""
         buttonText = getString(R.string.processing)
@@ -183,7 +197,7 @@ class ConverterFragment : Fragment(), ConverterResultCallback, AnalyzerResultCal
         binding.messageView.text = messageText
     }
 
-    override fun conversionDone(result: Int?) {
+    private fun conversionDone(result: Int) {
         isConverting = false
         buttonText = getString(R.string.analyze)
         projects.clear()
@@ -193,7 +207,7 @@ class ConverterFragment : Fragment(), ConverterResultCallback, AnalyzerResultCal
         binding.convert.text = buttonText
         binding.progressBar.visibility = View.GONE
 
-        if (result != null && result >= 0) {
+        if (result >= 0) {
             messageText = getString(R.string.conversion_complete, result)
             binding.messageView.text = messageText
         } else {
@@ -215,13 +229,21 @@ class ConverterFragment : Fragment(), ConverterResultCallback, AnalyzerResultCal
     }
 
     override fun onEdit(project: Project) {
-        val ft: FragmentTransaction = parentFragmentManager.beginTransaction()
-        ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-        ft.replace(
-            R.id.fragment_container,
-            TransformerFragment.newInstance(project)
-        )
-        ft.addToBackStack(null)
-        ft.commit()
+        parentFragmentManager.beginTransaction()
+            .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+            .replace(R.id.fragment_container, TransformerFragment.newInstance(project))
+            .addToBackStack(null)
+            .commit()
+    }
+
+
+    private fun showErrorDialog(error: String) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(R.string.error_occurred)
+        builder.setMessage(error)
+        builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.create().show()
     }
 }

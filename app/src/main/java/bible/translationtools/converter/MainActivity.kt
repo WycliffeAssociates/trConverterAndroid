@@ -21,12 +21,12 @@ class MainActivity : FragmentActivity() {
         val fm = supportFragmentManager
         val ft = fm.beginTransaction()
 
-        var fragment = fm.findFragmentById(R.id.fragment_container)
+        val fragment = fm.findFragmentById(R.id.fragment_container)
 
         if (fragment == null) {
-            fragment = HomeFragment()
-            ft.add(R.id.fragment_container, fragment)
-            ft.commit()
+            ft.replace(R.id.fragment_container, HomeFragment())
+                .addToBackStack(null)
+                .commit()
         }
 
         return super.onCreateView(name, context, attrs)
