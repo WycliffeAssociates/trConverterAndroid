@@ -34,4 +34,6 @@
     <string name="invalid_backup">Invalid backup file</string>
     <string name="export">export</string>
     <string name="unknown_error">Unknown error</string>
+    <string name="success">Success</string>
+    <string name="project_exported">Project exported successfully</string>
 </resources>

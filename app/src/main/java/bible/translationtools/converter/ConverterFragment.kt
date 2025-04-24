@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import bible.translationtools.converter.databinding.ConverterFragmentBinding
@@ -109,7 +110,9 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
             TransformerFragment.TRANSFORMER_ID,
             viewLifecycleOwner
         ) { requestKey, bundle ->
-            bundle.getString(TransformerFragment.TRANSFORMER_ERROR_KEY)?.let(::showErrorDialog)
+            bundle.getString(TransformerFragment.TRANSFORMER_ERROR_KEY)?.let {
+                showMessageDialog(R.string.error_occurred, it)
+            }
         }
     }
 
@@ -119,7 +122,9 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
         uiScope.launch(Dispatchers.IO) {
             val result = analyze(converter)
             if (!result.success) {
-                result.error?.let(::showErrorDialog)
+                result.error?.let {
+                    showMessageDialog(R.string.error_occurred, it)
+                }
             }
             handler.post { analyzeDone() }
         }
@@ -255,20 +260,28 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
     }
 
     private fun export(project: Project, uri: Uri) {
+        val handler = Handler(Looper.getMainLooper())
         uiScope.launch(Dispatchers.IO) {
             val result = exportProject(project, uri)
             if (result.success) {
-                println("exported")
+                handler.post {
+                    showMessageDialog(R.string.success, getString(R.string.project_exported))
+                }
             } else {
-                showErrorDialog(result.error ?: getString(R.string.unknown_error))
+                handler.post {
+                    showMessageDialog(
+                        R.string.error_occurred,
+                        result.error ?: getString(R.string.unknown_error)
+                    )
+                }
             }
         }
     }
 
-    private fun showErrorDialog(error: String) {
+    private fun showMessageDialog(@StringRes title: Int, message: String) {
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(R.string.error_occurred)
-        builder.setMessage(error)
+        builder.setTitle(title)
+        builder.setMessage(message)
         builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
             dialog.dismiss()
         }
