@@ -12,6 +12,7 @@ import bible.translationtools.converterlib.Project
 class ModeListAdapter : BaseAdapter() {
     interface OnEditProjectListener {
         fun onEdit(project: Project)
+        fun onExport(project: Project)
     }
 
     private var listener: OnEditProjectListener? = null
@@ -63,6 +64,9 @@ class ModeListAdapter : BaseAdapter() {
                 binding.projectTextView.setTextColor(if (item.shouldUpdate) Color.RED else Color.GRAY)
                 binding.editProject.setOnClickListener {
                     listener?.onEdit(item)
+                }
+                binding.exportProject.setOnClickListener {
+                    listener?.onExport(item)
                 }
             } else {
                 binding.projectTextView.setTextColor(if (isEmpty == true) Color.RED else Color.BLACK)

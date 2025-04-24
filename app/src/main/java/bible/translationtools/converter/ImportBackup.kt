@@ -10,7 +10,7 @@ import java.io.IOException
 import java.util.UUID
 import javax.inject.Inject
 
-class ExtractBackup @Inject constructor(
+class ImportBackup @Inject constructor(
     @ApplicationContext private val context: Context,
     private val directoryProvider: DirectoryProvider
 ) {

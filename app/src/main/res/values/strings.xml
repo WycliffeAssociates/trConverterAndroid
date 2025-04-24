@@ -32,4 +32,6 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="invalid_backup">Invalid backup file</string>
+    <string name="export">export</string>
+    <string name="unknown_error">Unknown error</string>
 </resources>

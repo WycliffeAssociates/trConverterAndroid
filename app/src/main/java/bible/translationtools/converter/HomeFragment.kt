@@ -23,7 +23,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     @Inject lateinit var directoryProvider: DirectoryProvider
-    @Inject lateinit var extractBackup: ExtractBackup
+    @Inject lateinit var importBackup: ImportBackup
 
     private var openDirectory: ActivityResultLauncher<Uri?>? = null
     private var openBackup: ActivityResultLauncher<String?>? = null
@@ -40,7 +40,7 @@ class HomeFragment : Fragment() {
             uri?.let(::importDirectory)
         }
         openBackup = registerForActivityResult(GetContent()) { uri: Uri? ->
-            uri?.let(::importBackup)
+            uri?.let(::import)
         }
     }
 
@@ -108,13 +108,13 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun importBackup(uri: Uri) {
+    private fun import(uri: Uri) {
         val handler = Handler(Looper.getMainLooper())
         uiScope.launch(Dispatchers.IO) {
             try {
                 FileUtils.deleteRecursive(directoryProvider.workspaceDir)
 
-                val result = extractBackup(uri)
+                val result = importBackup(uri)
                 if (result.success) {
                     handler.post { loadWorkspace() }
                 } else {

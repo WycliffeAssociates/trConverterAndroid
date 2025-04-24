@@ -17,7 +17,7 @@ const val USER_DATA_DIR = "user_data"
 const val CACHE_DIR = "cache"
 const val CODE_CACHE_DIR = "code_cache"
 
-class CreateBackup @Inject constructor(
+class ExportBackup @Inject constructor(
     @ApplicationContext private val context: Context,
     private val directoryProvider: DirectoryProvider
 ) {

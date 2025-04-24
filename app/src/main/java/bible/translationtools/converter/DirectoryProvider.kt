@@ -1,6 +1,7 @@
 package bible.translationtools.converter
 
 import android.content.Context
+import bible.translationtools.converterlib.Project
 import java.io.File
 
 interface DirectoryProvider {
@@ -30,6 +31,11 @@ interface DirectoryProvider {
      * Returns the absolute path to the workspace directory on the filesystem.
      */
     val workspaceDir: File
+
+    /**
+     * Returns the absolute path to the project directory on the filesystem.
+     */
+    fun getProjectDir(project: Project): File?
 
     /**
      * Creates a temporary directory in the cache directory.
@@ -74,6 +80,15 @@ class DirectoryProviderImpl (private val context: Context) : DirectoryProvider {
             }
             return workspace
         }
+
+    override fun getProjectDir(project: Project): File? {
+        val projectPath = "${project.language}/${project.version}/${project.book}"
+        val projectDir = File(workspaceDir, projectPath)
+
+        return if (projectDir.exists()) {
+            return projectDir
+        } else null
+    }
 
     override fun createTempDir(name: String?): File {
         val tempName = name ?: System.currentTimeMillis().toString()
