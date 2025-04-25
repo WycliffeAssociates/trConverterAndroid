@@ -39,4 +39,8 @@
     <string name="export_backup_menu">Export Backup</string>
     <string name="share_backup_menu">Share Backup</string>
     <string name="backup_exported">Backup exported successfully</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="preparing_backup">Preparing backup...</string>
+    <string name="preparing_workspace">Preparing workspace...</string>
+    <string name="transforming">Transforming...</string>
 </resources>

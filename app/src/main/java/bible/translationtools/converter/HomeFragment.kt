@@ -1,6 +1,7 @@
 package bible.translationtools.converter
 
 import android.app.AlertDialog
+import android.app.Dialog
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -12,6 +13,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import bible.translationtools.converter.databinding.HomeFragmentBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,6 +35,8 @@ class HomeFragment : Fragment() {
 
     private lateinit var backPressedCallback: OnBackPressedCallback
     private val uiScope = CoroutineScope(Dispatchers.Main)
+
+    private var waitDialog: Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +72,8 @@ class HomeFragment : Fragment() {
             backPressedCallback
         )
 
+        waitDialog = createWaitDialog()
+
         binding.openFolder.setOnClickListener {
             openDirectory?.launch(null)
         }
@@ -92,9 +98,16 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
         backPressedCallback.remove()
+
+        waitDialog?.dismiss()
+        waitDialog = null
     }
 
     private fun importDirectory(uri: Uri) {
+        Screen.lockOrientation(requireActivity())
+        waitDialog?.setTitle(R.string.preparing_workspace)
+        waitDialog?.show()
+
         val handler = Handler(Looper.getMainLooper())
         uiScope.launch(Dispatchers.IO) {
             try {
@@ -103,12 +116,19 @@ class HomeFragment : Fragment() {
 
                 handler.post { loadWorkspace() }
             } catch (e: Exception) {
-                e.printStackTrace()
+                showMessageDialog(
+                    R.string.error_occurred,
+                    e.message ?: getString(R.string.unknown_error)
+                )
             }
         }
     }
 
     private fun import(uri: Uri) {
+        Screen.lockOrientation(requireActivity())
+        waitDialog?.setTitle(R.string.preparing_workspace)
+        waitDialog?.show()
+
         val handler = Handler(Looper.getMainLooper())
         uiScope.launch(Dispatchers.IO) {
             try {
@@ -118,7 +138,10 @@ class HomeFragment : Fragment() {
                 if (result.success) {
                     handler.post { loadWorkspace() }
                 } else {
-                    println(result.message)
+                    showMessageDialog(
+                        R.string.error_occurred,
+                        result.message ?: getString(R.string.unknown_error)
+                    )
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -127,6 +150,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadWorkspace() {
+        waitDialog?.dismiss()
+        Screen.unlockOrientation(requireActivity())
+
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, ConverterFragment())
             .addToBackStack(null)
@@ -143,5 +169,22 @@ class HomeFragment : Fragment() {
             }
             .setNegativeButton(R.string.no, null)
             .show()
+    }
+
+    private fun showMessageDialog(@StringRes title: Int, message: String) {
+        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        builder.setTitle(title)
+        builder.setMessage(message)
+        builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.create().show()
+    }
+
+    private fun createWaitDialog(): Dialog {
+        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        builder.setMessage(R.string.please_wait)
+        builder.setCancelable(false)
+        return builder.create()
     }
 }

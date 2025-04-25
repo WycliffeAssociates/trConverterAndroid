@@ -1,5 +1,6 @@
 package bible.translationtools.converter
 
+import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -69,25 +70,7 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
     private var shareBackup: ActivityResultLauncher<Intent>? = null
     private var shareBackupFile: File? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        selectExportProject = registerForActivityResult(CreateDocument("application/zip")) { uri ->
-            uri?.let { out ->
-                projectToExport?.let { project ->
-                    exportProject(project, out)
-                }
-            }
-        }
-        selectExportBackup = registerForActivityResult(CreateDocument("application/zip")) { uri ->
-            uri?.let { out ->
-                doExportBackup(out)
-            }
-        }
-        shareBackup = registerForActivityResult(StartActivityForResult()) { result ->
-            println(result)
-            shareBackupFile?.let(FileUtils::deleteRecursive)
-        }
-    }
+    private var waitDialog: Dialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -127,6 +110,24 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
             viewLifecycleOwner,
             Lifecycle.State.STARTED
         )
+
+        waitDialog = createWaitDialog()
+
+        selectExportProject = registerForActivityResult(CreateDocument("application/zip")) { uri ->
+            uri?.let { out ->
+                projectToExport?.let { project ->
+                    exportProject(project, out)
+                }
+            }
+        }
+        selectExportBackup = registerForActivityResult(CreateDocument("application/zip")) { uri ->
+            uri?.let { out ->
+                doExportBackup(out)
+            }
+        }
+        shareBackup = registerForActivityResult(StartActivityForResult()) { result ->
+            shareBackupFile?.let(FileUtils::deleteRecursive)
+        }
 
         init()
     }
@@ -297,6 +298,9 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+
+        waitDialog?.dismiss()
+        waitDialog = null
     }
 
     override fun onEdit(project: Project) {
@@ -358,6 +362,10 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
     }
 
     private fun shareBackup() {
+        Screen.lockOrientation(requireActivity())
+        waitDialog?.setTitle(R.string.preparing_backup)
+        waitDialog?.show()
+
         val handler = Handler(Looper.getMainLooper())
         uiScope.launch(Dispatchers.IO) {
             val date = Date()
@@ -380,6 +388,8 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
             shareBackupFile = zipFile
 
             handler.post {
+                waitDialog?.dismiss()
+                Screen.unlockOrientation(requireActivity())
                 shareBackup?.launch(shareIntent)
             }
         }
@@ -393,5 +403,12 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
             dialog.dismiss()
         }
         builder.create().show()
+    }
+
+    private fun createWaitDialog(): Dialog {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setMessage(R.string.please_wait)
+        builder.setCancelable(false)
+        return builder.create()
     }
 }

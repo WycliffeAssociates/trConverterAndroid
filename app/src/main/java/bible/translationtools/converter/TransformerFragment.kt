@@ -1,5 +1,6 @@
 package bible.translationtools.converter
 
+import android.app.Dialog
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -9,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import bible.translationtools.converter.databinding.TransformerFragmentBinding
 import bible.translationtools.converterlib.ITransformer
@@ -51,6 +53,8 @@ class TransformerFragment : Fragment() {
 
     private val uiScope = CoroutineScope(Dispatchers.Main)
 
+    private var waitDialog: Dialog? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -67,6 +71,8 @@ class TransformerFragment : Fragment() {
         buttonText = getString(R.string.transform) // Default value
         binding.languages.setTitle(getString(R.string.select_language))
 
+        waitDialog = createWaitDialog()
+
         try {
             readBundle(requireArguments())
             init()
@@ -76,6 +82,10 @@ class TransformerFragment : Fragment() {
     }
 
     private fun transform() {
+        Screen.lockOrientation(requireActivity())
+        waitDialog?.setTitle(R.string.transforming)
+        waitDialog?.show()
+
         newLanguage = binding.languages.selectedItem as Language?
         newVersion = binding.versions.selectedItem as Version?
 
@@ -158,6 +168,7 @@ class TransformerFragment : Fragment() {
             binding.messageView.text = messageText
         }
         binding.messageView.setTextColor(Color.BLACK)
+        waitDialog?.dismiss()
         println("Finished!")
     }
 
@@ -225,6 +236,9 @@ class TransformerFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+
+        waitDialog?.dismiss()
+        waitDialog = null
     }
 
     private fun finishWithError(error: String) {
@@ -232,6 +246,13 @@ class TransformerFragment : Fragment() {
         bundle.putString(TRANSFORMER_ERROR_KEY, error)
         parentFragmentManager.setFragmentResult(TRANSFORMER_ID, bundle)
         parentFragmentManager.popBackStack()
+    }
+
+    private fun createWaitDialog(): Dialog {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setMessage(R.string.please_wait)
+        builder.setCancelable(false)
+        return builder.create()
     }
 
     companion object {
