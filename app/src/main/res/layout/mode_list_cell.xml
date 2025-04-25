@@ -55,7 +55,7 @@
         android:layout_height="35dp"
         android:layout_marginHorizontal="8dp"
         android:layout_marginVertical="8dp"
-        android:background="@drawable/round_corner_secondary_small"
+        android:background="@drawable/round_corner_primary"
         android:paddingHorizontal="5dp"
         android:paddingBottom="3dp"
         android:text="@string/edit"
