@@ -33,6 +33,11 @@ interface DirectoryProvider {
     val workspaceDir: File
 
     /**
+     * Returns the absolute path to the shared directory on the filesystem.
+     */
+    val sharedDir: File
+
+    /**
      * Returns the absolute path to the project directory on the filesystem.
      */
     fun getProjectDir(project: Project): File?
@@ -79,6 +84,15 @@ class DirectoryProviderImpl (private val context: Context) : DirectoryProvider {
                 workspace.mkdirs()
             }
             return workspace
+        }
+
+    override val sharedDir: File
+        get() {
+            val shared = File(externalAppDir, "shared")
+            if (!shared.exists()) {
+                shared.mkdirs()
+            }
+            return shared
         }
 
     override fun getProjectDir(project: Project): File? {

@@ -1,5 +1,6 @@
 package bible.translationtools.converter
 
+import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -14,8 +15,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -28,6 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -41,6 +45,7 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
     @Inject lateinit var convert: Convert
     @Inject lateinit var exportProject: ExportProject
     @Inject lateinit var exportBackup: ExportBackup
+    @Inject lateinit var zipBackup: ZipBackup
 
     private var isAnalyzing = false
     private var isConverting = false
@@ -61,6 +66,8 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
     private var projectToExport: Project? = null
     private var selectExportProject: ActivityResultLauncher<String>? = null
     private var selectExportBackup: ActivityResultLauncher<String>? = null
+    private var shareBackup: ActivityResultLauncher<Intent>? = null
+    private var shareBackupFile: File? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +82,10 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
             uri?.let { out ->
                 doExportBackup(out)
             }
+        }
+        shareBackup = registerForActivityResult(StartActivityForResult()) { result ->
+            println(result)
+            shareBackupFile?.let(FileUtils::deleteRecursive)
         }
     }
 
@@ -347,7 +358,31 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
     }
 
     private fun shareBackup() {
-        println("share backup")
+        val handler = Handler(Looper.getMainLooper())
+        uiScope.launch(Dispatchers.IO) {
+            val date = Date()
+            val dateString = SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.US).format(date)
+            val zipFile = zipBackup("$dateString.zip")
+
+            val contentUri = FileProvider.getUriForFile(
+                requireContext(),
+                "bible.translationtools.converter.fileprovider",
+                zipFile
+            )
+
+            val shareIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_STREAM, contentUri)
+                type = "application/zip"
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+
+            shareBackupFile = zipFile
+
+            handler.post {
+                shareBackup?.launch(shareIntent)
+            }
+        }
     }
 
     private fun showMessageDialog(@StringRes title: Int, message: String) {
