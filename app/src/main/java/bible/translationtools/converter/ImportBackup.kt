@@ -73,7 +73,9 @@ class ImportBackup @Inject constructor(
         }
     }
 
-    private companion object {
+    companion object {
+        const val APP_DATA_DIR = "app_data"
+        const val USER_DATA_DIR = "user_data"
         const val FILES_DIR = "files"
         const val TRANSLATIONS_DIR = "translations"
     }

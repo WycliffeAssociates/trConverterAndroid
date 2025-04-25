@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">BTT Converter</string>
-    <string name="app_info">BTT Converter v.1.6.3</string>
+    <string name="app_info">BTT Converter v.1.7.0</string>
     <string name="convert">Convert</string>
     <string name="analyze">Analyze</string>
     <string name="transform">Transform</string>
@@ -36,4 +36,7 @@
     <string name="unknown_error">Unknown error</string>
     <string name="success">Success</string>
     <string name="project_exported">Project exported successfully</string>
+    <string name="export_backup_menu">Export Backup</string>
+    <string name="share_backup_menu">Share Backup</string>
+    <string name="backup_exported">Backup exported successfully</string>
 </resources>

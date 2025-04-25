@@ -6,6 +6,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -13,7 +16,10 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import bible.translationtools.converter.databinding.ConverterFragmentBinding
 import bible.translationtools.converterlib.Converter
 import bible.translationtools.converterlib.IConverter
@@ -22,6 +28,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -31,6 +40,7 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
     @Inject lateinit var analyze: Analyze
     @Inject lateinit var convert: Convert
     @Inject lateinit var exportProject: ExportProject
+    @Inject lateinit var exportBackup: ExportBackup
 
     private var isAnalyzing = false
     private var isConverting = false
@@ -49,15 +59,21 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
     private val uiScope = CoroutineScope(Dispatchers.Main)
 
     private var projectToExport: Project? = null
-    private var selectExport: ActivityResultLauncher<String>? = null
+    private var selectExportProject: ActivityResultLauncher<String>? = null
+    private var selectExportBackup: ActivityResultLauncher<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        selectExport = registerForActivityResult(CreateDocument("application/zip")) { uri ->
+        selectExportProject = registerForActivityResult(CreateDocument("application/zip")) { uri ->
             uri?.let { out ->
                 projectToExport?.let { project ->
-                    export(project, out)
+                    exportProject(project, out)
                 }
+            }
+        }
+        selectExportBackup = registerForActivityResult(CreateDocument("application/zip")) { uri ->
+            uri?.let { out ->
+                doExportBackup(out)
             }
         }
     }
@@ -74,6 +90,33 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.convert_menu, menu)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    val id = menuItem.itemId
+                    return when (id) {
+                        R.id.export_backup -> {
+                            exportBackup()
+                            true
+                        }
+                        R.id.share_backup -> {
+                            shareBackup()
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            },
+            viewLifecycleOwner,
+            Lifecycle.State.STARTED
+        )
+
         init()
     }
 
@@ -256,13 +299,13 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
     override fun onExport(project: Project) {
         val filename = "${project.language}_${project.version}_${project.book}.zip"
         projectToExport = project
-        selectExport?.launch(filename)
+        selectExportProject?.launch(filename)
     }
 
-    private fun export(project: Project, uri: Uri) {
+    private fun exportProject(project: Project, uri: Uri) {
         val handler = Handler(Looper.getMainLooper())
         uiScope.launch(Dispatchers.IO) {
-            val result = exportProject(project, uri)
+            val result = exportProject.invoke(project, uri)
             if (result.success) {
                 handler.post {
                     showMessageDialog(R.string.success, getString(R.string.project_exported))
@@ -276,6 +319,35 @@ class ConverterFragment : Fragment(), ModeListAdapter.OnEditProjectListener {
                 }
             }
         }
+    }
+
+    private fun exportBackup() {
+        val date = Date()
+        val dateString = SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.US).format(date)
+        selectExportBackup?.launch("$dateString.zip")
+    }
+
+    private fun doExportBackup(uri: Uri) {
+        val handler = Handler(Looper.getMainLooper())
+        uiScope.launch(Dispatchers.IO) {
+            val result = exportBackup.invoke(uri)
+            if (result.success) {
+                handler.post {
+                    showMessageDialog(R.string.success, getString(R.string.backup_exported))
+                }
+            } else {
+                handler.post {
+                    showMessageDialog(
+                        R.string.error_occurred,
+                        result.error ?: getString(R.string.unknown_error)
+                    )
+                }
+            }
+        }
+    }
+
+    private fun shareBackup() {
+        println("share backup")
     }
 
     private fun showMessageDialog(@StringRes title: Int, message: String) {

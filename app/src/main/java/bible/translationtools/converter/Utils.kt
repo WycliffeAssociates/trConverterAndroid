@@ -1,5 +1,7 @@
 package bible.translationtools.converter
 
+import bible.translationtools.converter.ImportBackup.Companion.APP_DATA_DIR
+import bible.translationtools.converter.ImportBackup.Companion.USER_DATA_DIR
 import net.lingala.zip4j.ZipFile
 
 object Utils {
