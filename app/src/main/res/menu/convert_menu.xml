@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_more"
+        android:icon="@drawable/ic_more_vert_24"
+        android:orderInCategory="1"
+        app:showAsAction="ifRoom"
+        app:iconTint="@color/white"
+        android:title="More">
+
+        <menu>
+            <item
+                android:id="@+id/export_backup"
+                android:title="@string/export_backup_menu"
+                android:icon="@drawable/ic_file_upload_24"
+                app:showAsAction="never"
+                android:orderInCategory="1" />
+            <item
+                android:id="@+id/share_backup"
+                android:title="@string/share_backup_menu"
+                android:icon="@drawable/ic_share_24"
+                app:showAsAction="never"
+                android:orderInCategory="2"/>
+        </menu>
+    </item>
+
+</menu>

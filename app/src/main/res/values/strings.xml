@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">BTT Converter</string>
-    <string name="app_info">BTT Converter v.1.6.3</string>
+    <string name="app_info">BTT Converter v.1.7.0</string>
     <string name="convert">Convert</string>
     <string name="analyze">Analyze</string>
     <string name="transform">Transform</string>
@@ -19,14 +19,28 @@
     <string name="project">project</string>
     <string name="enter_language">Enter Language Code (en, fr, es-419, ...)</string>
     <string name="enter_version">Enter Version Code (ulb, udb, reg, ...)</string>
-    <string name="migrate">Migrate to BTT Recorder</string>
-    <string name="migrate_message">We found TranslationRecorder directory on your device. If you have BTT Recorder app installed, it is recommended to rename this directory to BttRecorder.</string>
     <string name="proceed">Proceed</string>
     <string name="cancel">Cancel</string>
-    <string name="migrating">Migrating</string>
-    <string name="migration_error">Migration failed. BttRecorder directory is already on your device.</string>
-    <string name="migration_success">Migration has been successfully completed!</string>
     <string name="select_version">Select version</string>
     <string name="select_language">Select language</string>
     <string name="all_books_check">Transform all books under %1$s</string>
+    <string name="open_folder">Open BTTRecorder Directory</string>
+    <string name="open_backup">Open BTTRecorder Backup</string>
+    <string name="open_workspace">Open Workspace</string>
+    <string name="exit_app">Exit App</string>
+    <string name="exit_confirm">Are you sure you want to exit?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="invalid_backup">Invalid backup file</string>
+    <string name="export">export</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="success">Success</string>
+    <string name="project_exported">Project exported successfully</string>
+    <string name="export_backup_menu">Export Backup</string>
+    <string name="share_backup_menu">Share Backup</string>
+    <string name="backup_exported">Backup exported successfully</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="preparing_backup">Preparing backup...</string>
+    <string name="preparing_workspace">Preparing workspace...</string>
+    <string name="transforming">Transforming...</string>
 </resources>
